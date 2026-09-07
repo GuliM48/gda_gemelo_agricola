@@ -1,0 +1,84 @@
+/* ============================================================
+   assets/estilos.css — Tema personalizado para GDA
+   Gemelo de Decisión Agronómica
+   ============================================================ */
+
+/* ─── Tarjetas de alerta ─── */
+.alerta-roja {
+    background-color: #ffebee;
+    border-left: 4px solid #e53935;
+    padding: 12px;
+    border-radius: 6px;
+    margin: 8px 0;
+}
+.alerta-naranja {
+    background-color: #fff3e0;
+    border-left: 4px solid #ff9800;
+    padding: 12px;
+    border-radius: 6px;
+    margin: 8px 0;
+}
+.alerta-verde {
+    background-color: #e8f5e9;
+    border-left: 4px solid #43a047;
+    padding: 12px;
+    border-radius: 6px;
+    margin: 8px 0;
+}
+
+/* ─── Métricas grandes ─── */
+.metrica-grande {
+    font-size: 28px;
+    font-weight: bold;
+    text-align: center;
+}
+
+/* ─── Resaltado umbral crítico ─── */
+.umbral-critico {
+    color: #e53935;
+    font-weight: bold;
+}
+
+/* ─── Spinner de carga personalizado ─── */
+div.stSpinner > div {
+    border-top-color: #4caf50 !important;
+}
+
+/* ─── Enlaces activos en menú lateral ─── */
+[data-testid="stSidebarNav"] a[aria-current="page"] {
+    background-color: #e8f5e9;
+    border-left: 3px solid #4caf50;
+}
+
+/* ─── Tarjetas de zonas en gemelo 3D ─── */
+.zona-card {
+    border-radius: 8px;
+    padding: 16px;
+    margin: 8px 0;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    transition: transform 0.2s;
+}
+.zona-card:hover {
+    transform: translateY(-2px);
+}
+
+/* ─── Encabezados científicos ─── */
+h1, h2, h3 {
+    font-family: 'Segoe UI', Arial, sans-serif;
+}
+
+/* ─── Tablas destacadas ─── */
+table.dataframe th {
+    background-color: #f1f8e9 !important;
+    color: #2e7d32 !important;
+}
+
+/* ─── Botones primarios ─── */
+.stButton > button[kind="primary"] {
+    background-color: #4caf50;
+    border-color: #4caf50;
+}
+.stButton > button[kind="primary"]:hover {
+    background-color: #388e3c;
+    border-color: #388e3c;
+}
