@@ -11,11 +11,11 @@ En la región SURESTE, el rendimiento simulado promedio fue 7.27 ton/ha. El mode
 
 ## 4.2 Desempeño comparativo: agente autónomo vs exploración manual
 
-Región NOROESTE: El agente exploró 50 escenarios en 19.9s, alcanzando un rendimiento máximo de 8.00 ton/ha.
+Región NOROESTE: El agente exploró 50 escenarios en 21.7s, alcanzando un rendimiento máximo de 8.00 ton/ha.
 
-Región CENTRO-OCCIDENTE: El agente exploró 50 escenarios en 19.5s, alcanzando un rendimiento máximo de 8.00 ton/ha.
+Región CENTRO-OCCIDENTE: El agente exploró 50 escenarios en 20.2s, alcanzando un rendimiento máximo de 8.00 ton/ha.
 
-Región SURESTE: El agente exploró 50 escenarios en 21.9s, alcanzando un rendimiento máximo de 8.00 ton/ha.
+Región SURESTE: El agente exploró 50 escenarios en 19.5s, alcanzando un rendimiento máximo de 8.00 ton/ha.
 
 
 ## 4.3 Análisis de sensibilidad global

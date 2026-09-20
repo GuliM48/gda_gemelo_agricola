@@ -121,6 +121,13 @@ def ejecutar_linea_experta(
     logger.info(f"Generando escenarios expertos para {region}")
 
     diseño_experto = generar_escenarios_heurísticos(region=region, n=num_escenarios)
+    
+    datos_clima = pd.DataFrame({
+        "precipitacion_mm": np.ones(150) * 5,
+        "t_max_c": np.ones(150) * 28,
+        "t_min_c": np.ones(150) * 16,
+        "radiacion_mj_m2": np.ones(150) * 18,
+    })
 
     resultados_list = []
     for _, fila in diseño_experto.iterrows():
@@ -133,7 +140,7 @@ def ejecutar_linea_experta(
             params["densidad"] = int(params.get("densidad", 70000))
             params["fecha_siembra_offset"] = float(params.get("fecha_siembra_offset", 0))
 
-            métricas = ejecutar_simulación_zona(region=region, parametros=params, dias=150)
+            métricas = ejecutar_simulación_zona(region=region, parametros=params, datos_clima=datos_clima, dias=150)
             if métricas.get("exito"):
                 resultado = {
                     "dosis_N": params["dosis_N"],
