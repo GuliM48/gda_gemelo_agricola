@@ -1,0 +1,6 @@
+Variable,Mínimo,Máximo,Unidad,Tipo
+dosis_N,0,250,kg/ha,continua
+momento_N,0,2,codigo,discreta
+estrategia_riego,0,2,codigo,discreta
+fecha_siembra_offset,-30,30,dias,continua
+densidad,50000,90000,plantas/ha,continua

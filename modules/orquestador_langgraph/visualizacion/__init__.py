@@ -1,0 +1,1 @@
+"""Generación de figuras para el artículo científico."""

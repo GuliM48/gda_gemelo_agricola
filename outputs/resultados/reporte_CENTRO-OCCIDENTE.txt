@@ -1,0 +1,54 @@
+======================================================================
+INFORME: AGENTE ORQUESTADOR LANGGRAPH — GEMELO DIGITAL DE MAÍZ
+======================================================================
+
+Región: CENTRO-OCCIDENTE
+Objetivo: max_rendimiento_min_agua_min_lixiviacion
+Escenarios explorados: 50
+Escenarios simulados exitosamente: 50
+
+--- ESTADÍSTICA DESCRIPTIVA ---
+  rendimiento_ton_ha: media=7.22, std=1.27, min=5.20, max=8.00
+  uso_agua_m3_ha: media=1594.20, std=0.00, min=1594.20, max=1594.20
+  lixiviacion_N_kg_ha: media=6.22, std=3.68, min=0.17, max=13.54
+  margen_economico_usd_ha: media=1329.77, std=244.45, min=836.41, max=1571.74
+
+--- VARIABLES MÁS INFLUYENTES ---
+  dosis_N: Σ|correlación|=1.2679
+  densidad: Σ|correlación|=1.2679
+  fecha_siembra_offset: Σ|correlación|=1.2646
+  estrategia_riego: Σ|correlación|=0.3642
+  momento_N: Σ|correlación|=0.0552
+
+--- ESCENARIOS ÓPTIMOS ---
+
+1. MÁXIMO RENDIMIENTO (8.00 ton/ha):
+   Dosis N: 171 kg/ha
+   Momento N: 2
+   Estrategia riego: 1
+   Densidad: 77380 plantas/ha
+
+2. MEJOR EFICIENCIA HIDRICA (0.01 kg/m³):
+   Dosis N: 171 kg/ha
+   Estrategia riego: 1
+   Rendimiento: 8.00 ton/ha
+
+3. MEJOR COMPROMISO MULTI-OBJETIVO (Pareto ideal):
+   rendimiento_ton_ha: 5.2000
+   uso_agua_m3_ha: 1594.2000
+   lixiviacion_N_kg_ha: 0.1700
+   margen_economico_usd_ha: 958.7200
+   dosis_N: 145.4664
+   momento_N: 1.0000
+   estrategia_riego: 2.0000
+   fecha_siembra_offset: -26.3463
+   densidad: 50368.0000
+
+--- TRADE-OFS ENTRE OBJETIVOS ---
+  Rendimiento vs Agua: r=nan (positivo=más agua=mayor rendimiento)
+  Rendimiento vs Lixiviación N: r=0.2326
+
+--- RECOMENDACIONES AGRONÓMICAS ---
+  • Región CENTRO-OCCIDENTE: optimizar dosis de N entre 100-200 kg/ha según suelo
+  • Aplicar N en encamado para maximizar eficiencia de uso
+  • Sistema de riego deficitario recomendado para optimizar recursos

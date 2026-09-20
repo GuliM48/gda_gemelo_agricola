@@ -1,0 +1,13 @@
+Región,Métrica,Media,Desv.Est.,Mín.,Máx.,Mediana
+NOROESTE,rendimiento_ton_ha,7.216,1.27,5.2,8.0,8.0
+NOROESTE,uso_agua_m3_ha,1594.2,0.0,1594.2,1594.2,1594.2
+NOROESTE,lixiviacion_N_kg_ha,6.2219,3.6785,0.17,13.54,6.3125
+NOROESTE,margen_economico_usd_ha,1329.7728,244.4488,836.41,1571.74,1450.13
+CENTRO-OCCIDENTE,rendimiento_ton_ha,7.216,1.27,5.2,8.0,8.0
+CENTRO-OCCIDENTE,uso_agua_m3_ha,1594.2,0.0,1594.2,1594.2,1594.2
+CENTRO-OCCIDENTE,lixiviacion_N_kg_ha,6.2219,3.6785,0.17,13.54,6.3125
+CENTRO-OCCIDENTE,margen_economico_usd_ha,1329.7728,244.4488,836.41,1571.74,1450.13
+SURESTE,rendimiento_ton_ha,7.272,1.2406,5.2,8.0,8.0
+SURESTE,uso_agua_m3_ha,1594.2,0.0,1594.2,1594.2,1594.2
+SURESTE,lixiviacion_N_kg_ha,4.3456,2.5658,0.119,9.392,4.419
+SURESTE,margen_economico_usd_ha,1359.6964,223.425,942.74,1562.26,1465.75

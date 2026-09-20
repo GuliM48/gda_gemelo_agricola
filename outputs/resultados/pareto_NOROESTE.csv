@@ -1,0 +1,3 @@
+rendimiento_ton_ha,uso_agua_m3_ha,lixiviacion_N_kg_ha,margen_economico_usd_ha,escenario_id,dosis_N,momento_N,estrategia_riego,fecha_siembra_offset,densidad
+5.2,1594.2,0.17,958.72,10.0,145.4664278363801,1,2,-26.34629331578987,50368
+8.0,1594.2,2.345,1571.74,3.0,124.19468841030405,1,2,-23.279172091663604,58558
