@@ -31,6 +31,7 @@
 ## 🚀 Instalación Paso a Paso
 
 ### 1. Preparar entorno Python
+
 ```bash
 cd gda_gemelo_agricola
 python3.10 -m venv venv
@@ -40,6 +41,7 @@ pip install -r requisitos.txt
 ```
 
 ### 2. Instalar PostgreSQL + PostGIS
+
 ```bash
 # Ubuntu / Debian
 sudo apt update
@@ -49,6 +51,7 @@ sudo apt install postgresql postgresql-contrib postgis
 ```
 
 ### 3. Crear base de datos y usuario
+
 ```sql
 -- Ejecutar en consola psql o pgAdmin
 CREATE DATABASE gda_gemelo;
@@ -61,12 +64,15 @@ GRANT ALL ON SCHEMA public TO gda_usuario;
 ```
 
 ### 4. Cargar esquema de base de datos
+
 ```bash
 psql -U gda_usuario -d gda_gemelo -f data/esquema.sql
 ```
 
 ### 5. Configurar conexión
+
 Edita `config/settings.py` con tus credenciales reales:
+
 ```python
 CONFIG_DB = {
     "host": "localhost",
@@ -78,6 +84,7 @@ CONFIG_DB = {
 ```
 
 ### 6. Ejecutar la aplicación
+
 ```bash
 streamlit run app.py
 ```
@@ -118,40 +125,43 @@ gda_gemelo_agricola/
 
 Ubicados en `config/settings.py`:
 
-| Parámetro | Valor | Descripción |
-|---|---|---|
-| `UMBRAL_ALERTA_ROJA_PCT` | 70.0 | Umbral de activación de alerta prioritaria |
-| `SEMANAS_ANTICIPACION_DEFECTO` | 6 | Anticipación por defecto (rango 4–8) |
-| `PESOS_ALERTA` | NDVI 35%, Hídrico 35%, Nutricional 15%, Clima 15% | Ponderación del modelo de riesgo |
-| `COEFICIENTES_KY` | Hídrico 0.65, Nutricional 0.35 | Coeficientes FAO de respuesta al estrés |
-| `DURACION_SIMULACION_DIAS` | 135 | Duración ciclo de cultivo |
+| Parámetro                      | Valor                                             | Descripción                                |
+| ------------------------------ | ------------------------------------------------- | ------------------------------------------ |
+| `UMBRAL_ALERTA_ROJA_PCT`       | 70.0                                              | Umbral de activación de alerta prioritaria |
+| `SEMANAS_ANTICIPACION_DEFECTO` | 6                                                 | Anticipación por defecto (rango 4–8)       |
+| `PESOS_ALERTA`                 | NDVI 35%, Hídrico 35%, Nutricional 15%, Clima 15% | Ponderación del modelo de riesgo           |
+| `COEFICIENTES_KY`              | Hídrico 0.65, Nutricional 0.35                    | Coeficientes FAO de respuesta al estrés    |
+| `DURACION_SIMULACION_DIAS`     | 135                                               | Duración ciclo de cultivo                  |
 
 ---
 
 ## 🔑 Roles y Permisos
 
-| Rol | Simulación | Motor IA | Reportes | Gestión Usuarios |
-|---|:---:|:---:|:---:|:---:|
-| **Administrador** | ✅ | ✅ | ✅ | ✅ |
-| **Agrónomo** | ✅ | ✅ | ✅ | ❌ |
-| **Agricultor** | ✅ | ❌ | ✅ | ❌ |
-| **Visor** | ❌ | ❌ | ❌ | ❌ |
+| Rol               | Simulación | Motor IA | Reportes | Gestión Usuarios |
+| ----------------- | :--------: | :------: | :------: | :--------------: |
+| **Administrador** |     ✅     |    ✅    |    ✅    |        ✅        |
+| **Agrónomo**      |     ✅     |    ✅    |    ✅    |        ❌        |
+| **Agricultor**    |     ✅     |    ❌    |    ✅    |        ❌        |
+| **Visor**         |     ❌     |    ❌    |    ❌    |        ❌        |
 
 ---
 
 ## 🧪 Fundamento Científico
 
 ### Modelo de Estrés Hídrico
+
 - Basado en **FAO 56**: balance hídrico diario + coeficientes de cultivo (Kc) por fase fenológica
 - Umbral de estrés: fracción de agua útil < 50%
 - Coeficiente de respuesta Ky = 0.65 para estrés hídrico
 
 ### Modelo de Alerta Temprana
+
 - Combinación lineal ponderada de 4 factores agronómicamente validados
 - Umbral de decisión: **≥ 70% probabilidad** → intervención recomendada
 - Anticipación: 4–8 semanas antes del impacto en rendimiento final
 
 ### Validación
+
 - Validación cruzada espacial para evitar fuga de datos geográficos
 - Métricas: R², RMSE, MAE
 - Explicabilidad: Importancia por permutación + valores SHAP
@@ -170,12 +180,12 @@ Ubicados en `config/settings.py`:
 
 ## 🔧 Solución de Problemas
 
-| Problema | Solución |
-|---|---|
-| Error conexión BD | Verificar credenciales en `config/settings.py`; servicio PostgreSQL activo |
-| Falta PostGIS | Ejecutar `CREATE EXTENSION postgis;` en la base de datos |
-| Error de dependencias | Actualizar pip: `pip install --upgrade pip` antes de instalar |
-| Chatbot de voz no funciona | Usar navegador Chrome/Edge; Web Speech API no soportada en Firefox |
+| Problema                   | Solución                                                                   |
+| -------------------------- | -------------------------------------------------------------------------- |
+| Error conexión BD          | Verificar credenciales en `config/settings.py`; servicio PostgreSQL activo |
+| Falta PostGIS              | Ejecutar `CREATE EXTENSION postgis;` en la base de datos                   |
+| Error de dependencias      | Actualizar pip: `pip install --upgrade pip` antes de instalar              |
+| Chatbot de voz no funciona | Usar navegador Chrome/Edge; Web Speech API no soportada en Firefox         |
 
 ---
 
@@ -188,7 +198,9 @@ Proyecto de investigación y desarrollo. Uso académico y profesional permitido.
 ## 🚀 Prueba Rápida
 
 Si no tienes PostgreSQL configurado, la aplicación aún funciona en modo demostración:
+
 ```bash
 streamlit run app.py
 ```
+
 Los módulos de simulación, IA, alertas y reportes funcionan con datos sintéticos de ejemplo.
