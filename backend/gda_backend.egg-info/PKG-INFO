@@ -1,0 +1,13 @@
+Metadata-Version: 2.4
+Name: gda-backend
+Version: 1.0.0
+Summary: Backend FastAPI + Celery para Gemelo Digital Agrícola
+Requires-Python: >=3.10
+Requires-Dist: fastapi>=0.141.0
+Requires-Dist: uvicorn>=0.47.0
+Requires-Dist: celery>=5.6.0
+Requires-Dist: redis>=6.4.0
+Requires-Dist: sqlalchemy>=2.0
+Requires-Dist: psycopg2-binary>=2.9
+Requires-Dist: pydantic>=2.13
+Requires-Dist: email-validator>=2.3

@@ -1,0 +1,59 @@
+version: "3.8"
+
+services:
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: ${DB_NAME:-gda_gemelo}
+      POSTGRES_USER: ${DB_USER:-gda_usuario}
+      POSTGRES_PASSWORD: ${DB_PASS:-cambiar_contrasena_segura}
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    command: >
+      postgres -c shared_buffers=256MB -c max_connections=100
+
+  backend:
+    build: .
+    ports:
+      - "8000:8000"
+    environment:
+      - DB_HOST=postgres
+      - DB_PORT=5432
+      - DB_NAME=${DB_NAME:-gda_gemelo}
+      - DB_USER=${DB_USER:-gda_usuario}
+      - DB_PASS=${DB_PASS:-cambiar_contrasena_segura}
+      - CELERY_BROKER_URL=redis://redis:6379/0
+      - CELERY_RESULT_BACKEND=redis://redis:6379/0
+    depends_on:
+      - postgres
+      - redis
+    volumes:
+      - ./data:/app/data
+
+  celery_worker:
+    build: .
+    command: python run_worker.py
+    environment:
+      - DB_HOST=postgres
+      - DB_PORT=5432
+      - DB_NAME=${DB_NAME:-gda_gemelo}
+      - DB_USER=${DB_USER:-gda_usuario}
+      - DB_PASS=${DB_PASS:-cambiar_contrasena_segura}
+      - CELERY_BROKER_URL=redis://redis:6379/0
+      - CELERY_RESULT_BACKEND=redis://redis:6379/0
+    depends_on:
+      - redis
+      - backend
+
+volumes:
+  redis_data:
+  postgres_data:

@@ -16,7 +16,7 @@ CONFIG_DB = {
     "port": int(os.getenv("DB_PORT", 5432)),
     "database": os.getenv("DB_NAME", "gda_gemelo"),
     "user": os.getenv("DB_USER", "gda_usuario"),
-    "password": os.getenv("DB_PASS", "cambiar_contraseña_segura")
+    "password": os.getenv("DB_PASS", "cambiar_contrasena_segura")
 }
 
 # ─── PARÁMETROS CIENTÍFICOS DEL GEMELO ───

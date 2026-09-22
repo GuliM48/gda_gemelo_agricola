@@ -1,0 +1,143 @@
+# ============================================================
+# 🟢 DEPENDENCIAS NODE.JS / FRONTEND
+# ============================================================
+node_modules/
+jspm_packages/
+bower_components/
+
+# Lock files — CONSERVA SOLO UNO (el de tu gestor), comenta los demás
+# package-lock.json    # ← Descomenta si usas NPM
+# pnpm-lock.yaml        # ← Descomenta si usas PNPM
+# bun.lock              # ← Descomenta si usas Bun
+# yarn.lock             # ← Descomenta si usas Yarn
+
+# ============================================================
+# 🟡 PYTHON / FASTAPI / BACKEND
+# ============================================================
+# Byte-compilado / cache
+__pycache__/
+**/__pycache__/
+*.py[cod]
+*$py.class
+*.pyc
+
+# Entornos virtuales
+venv/
+env/
+ENV/
+.venv/
+.env/
+virtualenv/
+venv.bak/
+
+# Archivos de respaldo
+*.bak
+*.backup
+*.tmp
+*.swp
+*.swo
+*~
+
+# Distribución / builds
+build/
+dist/
+*.egg-info/
+*.egg
+.eggs/
+wheels/
+
+# Testing / cobertura
+.coverage
+.coverage.*
+htmlcov/
+.pytest_cache/
+.tox/
+.nox/
+coverage.xml
+*.cover
+
+# Linters / formateadores
+.mypy_cache/
+.ruff_cache/
+.pytype/
+
+# Jupyter
+.ipynb_checkpoints/
+
+# ============================================================
+# 🔴 VARIABLES DE ENTORNO (NUNCA SUBIR A GIT)
+# ============================================================
+.env
+.env.*
+!.env.example
+!.env.template
+
+# ============================================================
+# 🟣 SISTEMA OPERATIVO / EDITORES
+# ============================================================
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+._*
+
+# Windows
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+
+# Linux
+*~
+
+# VS Code
+.vscode/
+!.vscode/extensions.json
+!.vscode/settings.json.example
+
+# Otros editores
+.idea/
+*.sublime-project
+*.sublime-workspace
+*.iml
+.project
+.classpath
+.c9/
+*.launch
+.settings/
+
+# ============================================================
+# 🟠 LOGS Y DATOS TEMPORALES
+# ============================================================
+*.log
+logs/
+*.log.*
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Datos / resultados / modelos (no subir datos pesados)
+data/resultados/
+data/modelos_ml/
+*.pkl
+*.joblib
+*.parquet
+
+# Docker
+.dockerignore
+
+# ============================================================
+# 🟤 OTROS
+# ============================================================
+# Agent manager (si es temporal/configuración local)
+# agent-manager.json   # ← Descomenta si es configuración local, no subir
+
+# Streamlit
+.streamlit/secrets.toml
+
+# Archivos grandes
+*.zip
+*.tar.gz
+*.rar
+*.7z
