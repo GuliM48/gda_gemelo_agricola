@@ -3,22 +3,30 @@ from psycopg2.extras import RealDictCursor
 import streamlit as st
 from config.settings import CONFIG_DB
 
-def obtener_conexion():
+def decodificar_error(e):
+    """Decodifica errores de libpq en Windows (codificación local cp1252 / latin-1)"""
+    if isinstance(e, UnicodeDecodeError) and len(e.args) > 1 and isinstance(e.args[1], bytes):
+        return e.args[1].decode("cp1252", errors="replace").strip()
+    return str(e).strip()
+
+def obtener_conexion(mostrar_error=True):
     try:
         return psycopg2.connect(**CONFIG_DB)
-    except Exception as e:
-        st.error(f"Error de conexión: {e}")
+    except (Exception, UnicodeDecodeError) as e:
+        if mostrar_error:
+            msg = decodificar_error(e)
+            st.error(f"Error de conexión a PostgreSQL: {msg}")
         return None
 
 def probar_conexion():
-    conn = obtener_conexion()
+    conn = obtener_conexion(mostrar_error=False)
     if conn:
         conn.close()
         return True
     return False
 
 def ejecutar_consulta(sql, parametros=None):
-    conn = obtener_conexion()
+    conn = obtener_conexion(mostrar_error=True)
     if not conn: return []
     try:
         with conn.cursor(cursor_factory=RealDictCursor) as cur:
@@ -26,6 +34,9 @@ def ejecutar_consulta(sql, parametros=None):
             conn.commit()
             if cur.description:
                 return [dict(fila) for fila in cur.fetchall()]
+        return []
+    except Exception as e:
+        st.error(f"Error al ejecutar consulta: {decodificar_error(e)}")
         return []
     finally:
         conn.close()

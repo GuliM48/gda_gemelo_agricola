@@ -25,9 +25,13 @@ def crear_simulacion(
         elif simulacion.tipo == models.TareaTipo.ORQUESTACION_LANGGRAPH:
             task = orquestar_escenarios_task.delay(simulacion.id)
     except Exception as exc:
-        # Redis/Celery no disponible en desarrollo — la simulación queda en estado PENDIENTE
-        import logging
-        logging.getLogger(__name__).warning(f"Celery no disponible, simulación {simulacion.id} sin encolar: {exc}")
+        import logging, threading
+        logging.getLogger(__name__).warning(f"Celery/Redis no disponible, ejecutando en hilo local: {exc}")
+        if simulacion.tipo == models.TareaTipo.SIMULACION_ABM:
+            threading.Thread(target=ejecutar_simulacion_abm_task, args=(simulacion.id,), daemon=True).start()
+        elif simulacion.tipo == models.TareaTipo.ORQUESTACION_LANGGRAPH:
+            threading.Thread(target=orquestar_escenarios_task, args=(simulacion.id,), daemon=True).start()
+        task = type("Task", (), {"id": f"local-thread-{simulacion.id}"})()
 
     if task:
         try:

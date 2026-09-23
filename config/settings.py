@@ -4,11 +4,15 @@ Constantes científicas, umbrales, rutas y parámetros ajustables
 """
 import os
 from pathlib import Path
+from dotenv import load_dotenv
 
 # ─── RUTAS DEL SISTEMA ───
 RUTA_PROYECTO = Path(__file__).parent.parent
 RUTA_DATOS = RUTA_PROYECTO / "datos"
 RUTA_DATOS.mkdir(exist_ok=True)
+
+# Cargar variables de entorno desde .env si existe
+load_dotenv(RUTA_PROYECTO / ".env")
 
 # ─── BASE DE DATOS POSTGRESQL + POSTGIS ───
 CONFIG_DB = {

@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { apiFetch, SimulacionEstado } from '../client/api';
+import { apiFetch, type SimulacionEstado } from '../client/api';
 import { VisualizadorFlujo } from './VisualizadorFlujo';
 
 interface PanelProgresoProps {

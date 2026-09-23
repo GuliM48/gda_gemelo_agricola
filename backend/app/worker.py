@@ -1,26 +1,64 @@
-from celery import Celery
 import os
 import sys
 import logging
+import threading
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-celery_app = Celery(
-    "gemelo_digital_worker",
-    broker=os.getenv("CELERY_BROKER_URL", "redis://localhost:6379/0"),
-    backend=os.getenv("CELERY_RESULT_BACKEND", "redis://localhost:6379/0"),
-)
+try:
+    from celery import Celery
+    CELERY_DISPONIBLE = True
+    celery_app = Celery(
+        "gemelo_digital_worker",
+        broker=os.getenv("CELERY_BROKER_URL", "redis://localhost:6379/0"),
+        backend=os.getenv("CELERY_RESULT_BACKEND", "redis://localhost:6379/0"),
+    )
+    celery_app.conf.update(
+        task_serializer="json",
+        accept_content=["json"],
+        result_serializer="json",
+        timezone="UTC",
+        task_track_started=True,
+        task_time_limit=3600 * 4,
+        result_expires=86400,
+    )
+except ImportError:
+    CELERY_DISPONIBLE = False
+    celery_app = None
 
-celery_app.conf.update(
-    task_serializer="json",
-    accept_content=["json"],
-    result_serializer="json",
-    timezone="UTC",
-    task_track_started=True,
-    task_time_limit=3600 * 4,
-    result_expires=86400,
-)
+
+class LocalTask:
+    def __init__(self, func):
+        self.func = func
+
+    def delay(self, *args, **kwargs):
+        def _runner():
+            try:
+                self.func(None, *args, **kwargs)
+            except Exception as e:
+                logger.error(f"Error en tarea local: {e}")
+
+        t = threading.Thread(target=_runner, daemon=True)
+        t.start()
+
+        class FakeAsyncResult:
+            id = f"local-{t.ident}"
+
+        return FakeAsyncResult()
+
+    def __call__(self, *args, **kwargs):
+        return self.func(None, *args, **kwargs)
+
+
+def task_decorator(bind=False, name=None):
+    def decorator(fn):
+        if celery_app and CELERY_DISPONIBLE:
+            return celery_app.task(bind=bind, name=name)(fn)
+        return LocalTask(fn)
+
+    return decorator
+
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
@@ -37,7 +75,7 @@ def actualizar_progreso(db, simulacion_id: int, progreso: float, estado=None):
         crud.simulacion.actualizar(db, db_obj=simulacion, obj_in=actualizacion)
 
 
-@celery_app.task(bind=True, name="ejecutar_simulacion_abm")
+@task_decorator(bind=True, name="ejecutar_simulacion_abm")
 def ejecutar_simulacion_abm_task(self, simulacion_id: int):
     """Ejecutar una simulación ABM individual como tarea Celery"""
     db = SessionLocal()
@@ -69,7 +107,8 @@ def ejecutar_simulacion_abm_task(self, simulacion_id: int):
                 if dia % 15 == 0:
                     progreso = 0.05 + (dia / dias_totales) * 0.7
                     actualizar_progreso(db, simulacion_id, progreso)
-                    self.update_state(state="PROGRESS", meta={"progreso": progreso})
+                    if self and hasattr(self, "update_state"):
+                        self.update_state(state="PROGRESS", meta={"progreso": progreso})
 
             métricas = modelo.obtener_métricas_agrupadas()
             crud.resultado.crear_para_simulacion(
@@ -118,9 +157,9 @@ def ejecutar_simulacion_abm_task(self, simulacion_id: int):
         db.close()
 
 
-@celery_app.task(bind=True, name="orquestar_escenarios_langgraph")
+@task_decorator(bind=True, name="orquestar_escenarios_langgraph")
 def orquestar_escenarios_task(self, simulacion_id: int):
-    """Ejecutar el agente orquestador LangGraph completo como tarea Celery"""
+    """Ejecutar el agente orquestador LangGraph completo como tarea Celery o local"""
     db = SessionLocal()
     try:
         simulacion = crud.simulacion.obtener(db, id=simulacion_id)
@@ -151,7 +190,8 @@ def orquestar_escenarios_task(self, simulacion_id: int):
                 "tiempo_total_segundos": 0.0,
             }
 
-            self.update_state(state="PROGRESS", meta={"fase": "DISEÑANDO_ESCENARIOS", "progreso": 0.1})
+            if self and hasattr(self, "update_state"):
+                self.update_state(state="PROGRESS", meta={"fase": "DISEÑANDO_ESCENARIOS", "progreso": 0.1})
             actualizar_progreso(db, simulacion_id, 0.1)
 
             agente = construir_grafo()
@@ -227,8 +267,9 @@ def orquestar_escenarios_task(self, simulacion_id: int):
         db.close()
 
 
-@celery_app.task(name="entrenar_modelo_ml")
-def entrenar_modelo_ml_task(modelo_id: int, region: str, parametros: dict):
+@task_decorator(name="entrenar_modelo_ml")
+def entrenar_modelo_ml_task(self_or_id, modelo_id: int = None, region: str = None, parametros: dict = None):
     """Entrenar un modelo predictivo XGBoost"""
-    logger.info(f"Entrenando modelo {modelo_id} para región {region}")
-    return {"status": "ok", "modelo_id": modelo_id, "region": region}
+    m_id = modelo_id if modelo_id is not None else self_or_id
+    logger.info(f"Entrenando modelo {m_id} para región {region}")
+    return {"status": "ok", "modelo_id": m_id, "region": region}

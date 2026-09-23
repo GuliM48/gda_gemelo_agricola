@@ -9,7 +9,13 @@ class CRUDResultado(CRUDBase[ResultadoSimulacion, ResultadoSimulacionCrear, Resu
     def crear_para_simulacion(
         self, db: Session, *, simulacion_id: int, obj_in: ResultadoSimulacionCrear
     ) -> ResultadoSimulacion:
-        obj_in_data = obj_in.model_dump()
+        if hasattr(obj_in, "model_dump"):
+            obj_in_data = obj_in.model_dump()
+        elif isinstance(obj_in, dict):
+            obj_in_data = dict(obj_in)
+        else:
+            obj_in_data = getattr(obj_in, "__dict__", {})
+        obj_in_data.pop("simulacion_id", None)
         db_obj = self.model(simulacion_id=simulacion_id, **obj_in_data)
         db.add(db_obj)
         db.commit()

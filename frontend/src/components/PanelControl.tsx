@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { apiFetch, Region, SimulacionRespuesta } from '../client/api';
+import { apiFetch, type Region, type SimulacionRespuesta } from '../client/api';
 
 interface PanelControlProps {
   onLanzarSimulacion: (id: string) => void;

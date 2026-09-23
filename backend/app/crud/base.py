@@ -18,7 +18,12 @@ class CRUDBase(Generic[M, CreateSchema, UpdateSchema]):
         return db.query(self.model).offset(skip).limit(limit).all()
 
     def crear(self, db: Session, obj_in: CreateSchema) -> M:
-        obj_in_data = obj_in.model_dump() if hasattr(obj_in, "model_dump") else obj_in.__dict__
+        if hasattr(obj_in, "model_dump"):
+            obj_in_data = obj_in.model_dump()
+        elif isinstance(obj_in, dict):
+            obj_in_data = dict(obj_in)
+        else:
+            obj_in_data = getattr(obj_in, "__dict__", {})
         db_obj = self.model(**obj_in_data)
         db.add(db_obj)
         db.commit()
@@ -26,7 +31,12 @@ class CRUDBase(Generic[M, CreateSchema, UpdateSchema]):
         return db_obj
 
     def actualizar(self, db: Session, db_obj: M, obj_in: UpdateSchema) -> M:
-        update_data = obj_in.model_dump(exclude_unset=True) if hasattr(obj_in, "model_dump") else {k: v for k, v in obj_in.__dict__.items() if v is not None}
+        if hasattr(obj_in, "model_dump"):
+            update_data = obj_in.model_dump(exclude_unset=True)
+        elif isinstance(obj_in, dict):
+            update_data = {k: v for k, v in obj_in.items() if v is not None}
+        else:
+            update_data = {k: v for k, v in getattr(obj_in, "__dict__", {}).items() if v is not None}
         for field, value in update_data.items():
             setattr(db_obj, field, value)
         db.commit()

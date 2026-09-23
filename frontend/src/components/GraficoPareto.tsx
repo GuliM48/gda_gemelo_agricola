@@ -33,7 +33,7 @@ export const GraficoPareto: React.FC<GraficoParetoProps> = ({ pareto, resultados
               x: aguaPareto,
               y: rendPareto,
               type: 'scatter',
-              mode: 'markers+lines',
+              mode: 'lines+markers',
               name: 'Frente de Pareto (Óptimos)',
               line: { color: '#f59e0b', width: 2 },
               marker: { color: '#f59e0b', size: 10, symbol: 'diamond' }
@@ -46,11 +46,11 @@ export const GraficoPareto: React.FC<GraficoParetoProps> = ({ pareto, resultados
             plot_bgcolor: 'transparent',
             font: { color: '#f8fafc' },
             xaxis: {
-              title: 'Uso de Agua (m³/ha)',
+              title: { text: 'Uso de Agua (m³/ha)' },
               gridcolor: 'rgba(255,255,255,0.1)'
             },
             yaxis: {
-              title: 'Rendimiento (ton/ha)',
+              title: { text: 'Rendimiento (ton/ha)' },
               gridcolor: 'rgba(255,255,255,0.1)'
             },
             margin: { l: 50, r: 20, t: 30, b: 50 },

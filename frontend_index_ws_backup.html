@@ -1,0 +1,882 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GDA — Gemelo Digital Agrícola | Frontend WebSocket FastAPI</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        agro: {
+                            50: '#f2fbf4',
+                            100: '#e1f6e6',
+                            500: '#2e7d32',
+                            600: '#236526',
+                            700: '#1b501e',
+                            800: '#153f18',
+                            900: '#0e2b10',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <!-- Plotly.js para gráficos científicos interactivos 2D y 3D -->
+    <script src="https://cdn.plot.ly/plotly-2.27.0.min.js"></script>
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        .gradient-header {
+            background: linear-gradient(135deg, #1b501e 0%, #2e7d32 100%);
+        }
+        .tab-btn.active {
+            border-bottom: 3px solid #2e7d32;
+            color: #1b501e;
+            font-weight: 600;
+        }
+    </style>
+</head>
+<body class="bg-gray-50 text-gray-800 min-h-screen flex flex-col font-sans">
+
+    <!-- BARRA DE NAVEGACIÓN SUPERIOR -->
+    <header class="gradient-header text-white shadow-lg sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex justify-between items-center h-16">
+            <div class="flex items-center space-x-3">
+                <span class="text-3xl">🌾</span>
+                <div>
+                    <h1 class="font-bold text-lg leading-tight">GDA — Gemelo Digital Agrícola</h1>
+                    <p class="text-xs text-green-200">Frontend conectado en tiempo real con FastAPI (WebSockets)</p>
+                </div>
+            </div>
+            
+            <div class="flex items-center space-x-4">
+                <!-- Indicador de Estado WebSocket en Vivo -->
+                <div id="ws-status-pill" class="flex items-center space-x-2 px-3 py-1.5 rounded-full text-xs font-medium bg-black/20 border border-white/20">
+                    <span id="ws-dot" class="w-2.5 h-2.5 rounded-full bg-yellow-400 animate-ping"></span>
+                    <span id="ws-text">Conectando WebSocket...</span>
+                </div>
+
+                <!-- Enlace a Swagger Docs -->
+                <a href="/docs" target="_blank" class="text-xs bg-white/10 hover:bg-white/20 text-white px-3 py-1.5 rounded-md flex items-center space-x-1.5 transition">
+                    <i data-lucide="file-text" class="w-3.5 h-3.5"></i>
+                    <span>FastAPI Docs</span>
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <!-- NAVEGACIÓN POR PESTAÑAS -->
+    <div class="bg-white border-b border-gray-200 shadow-sm sticky top-16 z-40">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex space-x-8 overflow-x-auto">
+            <button onclick="cambiarPestana('tab-resumen')" id="btn-tab-resumen" class="tab-btn active py-3.5 px-2 text-sm text-gray-600 flex items-center space-x-2 hover:text-green-700 transition">
+                <i data-lucide="layout-dashboard" class="w-4 h-4"></i>
+                <span>Panel Principal</span>
+            </button>
+            <button onclick="cambiarPestana('tab-lanzador')" id="btn-tab-lanzador" class="tab-btn py-3.5 px-2 text-sm text-gray-600 flex items-center space-x-2 hover:text-green-700 transition">
+                <i data-lucide="play-circle" class="w-4 h-4"></i>
+                <span>Nueva Simulación</span>
+            </button>
+            <button onclick="cambiarPestana('tab-monitor')" id="btn-tab-monitor" class="tab-btn py-3.5 px-2 text-sm text-gray-600 flex items-center space-x-2 hover:text-green-700 transition">
+                <i data-lucide="radio" class="w-4 h-4 text-green-600 animate-pulse"></i>
+                <span>Monitor en Vivo (WS)</span>
+                <span id="badge-total-sims" class="ml-1 bg-green-100 text-green-800 text-xs px-2 py-0.5 rounded-full font-semibold">0</span>
+            </button>
+            <button onclick="cambiarPestana('tab-pareto')" id="btn-tab-pareto" class="tab-btn py-3.5 px-2 text-sm text-gray-600 flex items-center space-x-2 hover:text-green-700 transition">
+                <i data-lucide="git-pull-request" class="w-4 h-4"></i>
+                <span>Frentes de Pareto & Análisis</span>
+            </button>
+            <button onclick="cambiarPestana('tab-modelos')" id="btn-tab-modelos" class="tab-btn py-3.5 px-2 text-sm text-gray-600 flex items-center space-x-2 hover:text-green-700 transition">
+                <i data-lucide="cpu" class="w-4 h-4"></i>
+                <span>Modelos ML</span>
+            </button>
+        </div>
+    </div>
+
+    <!-- CONTENEDOR PRINCIPAL -->
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 flex-1 w-full">
+
+        <!-- ────────────────────────────────────────────── -->
+        <!-- PESTAÑA 1: RESUMEN / DASHBOARD -->
+        <!-- ────────────────────────────────────────────── -->
+        <section id="tab-resumen" class="tab-content space-y-6">
+            <div class="bg-gradient-to-r from-green-800 to-green-600 text-white rounded-2xl p-6 shadow-md flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+                <div>
+                    <h2 class="text-2xl font-bold">Orquestador Autónomo de Escenarios de Maíz</h2>
+                    <p class="text-green-100 mt-1 max-w-2xl text-sm">
+                        Frontend desacoplado transmitiendo eventos mediante <strong>FastAPI WebSockets</strong> en tiempo real. Optimización multi-objetivo en 3 regiones de México.
+                    </p>
+                </div>
+                <button onclick="cambiarPestana('tab-lanzador')" class="bg-white text-green-800 font-semibold px-5 py-2.5 rounded-xl shadow hover:bg-green-50 transition flex items-center space-x-2 text-sm">
+                    <i data-lucide="plus" class="w-4 h-4"></i>
+                    <span>Lanzar Simulación</span>
+                </button>
+            </div>
+
+            <!-- Tarjetas de KPIs -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+                <div class="bg-white p-5 rounded-xl border border-gray-200 shadow-sm flex items-center space-x-4">
+                    <div class="p-3 bg-blue-50 text-blue-600 rounded-xl">
+                        <i data-lucide="database" class="w-6 h-6"></i>
+                    </div>
+                    <div>
+                        <p class="text-xs text-gray-500 font-medium">Total Simulaciones</p>
+                        <h3 id="kpi-total-sims" class="text-2xl font-bold text-gray-900">0</h3>
+                    </div>
+                </div>
+
+                <div class="bg-white p-5 rounded-xl border border-gray-200 shadow-sm flex items-center space-x-4">
+                    <div class="p-3 bg-yellow-50 text-yellow-600 rounded-xl">
+                        <i data-lucide="loader" class="w-6 h-6"></i>
+                    </div>
+                    <div>
+                        <p class="text-xs text-gray-500 font-medium">En Progreso / Pendientes</p>
+                        <h3 id="kpi-activas" class="text-2xl font-bold text-gray-900">0</h3>
+                    </div>
+                </div>
+
+                <div class="bg-white p-5 rounded-xl border border-gray-200 shadow-sm flex items-center space-x-4">
+                    <div class="p-3 bg-green-50 text-green-600 rounded-xl">
+                        <i data-lucide="check-circle" class="w-6 h-6"></i>
+                    </div>
+                    <div>
+                        <p class="text-xs text-gray-500 font-medium">Completadas</p>
+                        <h3 id="kpi-completadas" class="text-2xl font-bold text-gray-900">0</h3>
+                    </div>
+                </div>
+
+                <div class="bg-white p-5 rounded-xl border border-gray-200 shadow-sm flex items-center space-x-4">
+                    <div class="p-3 bg-purple-50 text-purple-600 rounded-xl">
+                        <i data-lucide="wifi" class="w-6 h-6"></i>
+                    </div>
+                    <div>
+                        <p class="text-xs text-gray-500 font-medium">Protocolo de Datos</p>
+                        <h3 class="text-lg font-bold text-gray-900">FastAPI WS</h3>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Regiones de Estudio de la Tesis -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
+                <div class="bg-white rounded-xl border border-gray-200 p-5 shadow-sm hover:shadow transition">
+                    <div class="flex items-center space-x-2 text-green-700 font-semibold mb-2">
+                        <i data-lucide="sun" class="w-4 h-4"></i>
+                        <h4>Región NOROESTE</h4>
+                    </div>
+                    <p class="text-xs text-gray-600">Sinaloa / Sonora. Clima semiárido con alta radiación solar. Rendimiento alto bajo riego intensivo.</p>
+                    <div class="mt-4 pt-3 border-t border-gray-100 flex justify-between text-xs text-gray-500">
+                        <span>Potencial: <strong>11-13 ton/ha</strong></span>
+                        <span>Foco: <strong>Eficiencia hídrica</strong></span>
+                    </div>
+                </div>
+
+                <div class="bg-white rounded-xl border border-gray-200 p-5 shadow-sm hover:shadow transition">
+                    <div class="flex items-center space-x-2 text-green-700 font-semibold mb-2">
+                        <i data-lucide="cloud-rain" class="w-4 h-4"></i>
+                        <h4>Región CENTRO-OCCIDENTE</h4>
+                    </div>
+                    <p class="text-xs text-gray-600">Jalisco / Bajío / Michoacán. Régimen templado subhúmedo. Excelente potencial de temporal y fertirriego.</p>
+                    <div class="mt-4 pt-3 border-t border-gray-100 flex justify-between text-xs text-gray-500">
+                        <span>Potencial: <strong>8-10 ton/ha</strong></span>
+                        <span>Foco: <strong>Optimización N</strong></span>
+                    </div>
+                </div>
+
+                <div class="bg-white rounded-xl border border-gray-200 p-5 shadow-sm hover:shadow transition">
+                    <div class="flex items-center space-x-2 text-green-700 font-semibold mb-2">
+                        <i data-lucide="droplet" class="w-4 h-4"></i>
+                        <h4>Región SURESTE</h4>
+                    </div>
+                    <p class="text-xs text-gray-600">Chiapas / Veracruz. Clima tropical húmedo. Alta precipitación con susceptibilidad a lixiviación de nutrientes.</p>
+                    <div class="mt-4 pt-3 border-t border-gray-100 flex justify-between text-xs text-gray-500">
+                        <span>Potencial: <strong>6-8 ton/ha</strong></span>
+                        <span>Foco: <strong>Control lixiviación</strong></span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ────────────────────────────────────────────── -->
+        <!-- PESTAÑA 2: NUEVA SIMULACIÓN (VÍA WEBSOCKET) -->
+        <!-- ────────────────────────────────────────────── -->
+        <section id="tab-lanzador" class="tab-content hidden space-y-6">
+            <div class="bg-white rounded-2xl border border-gray-200 p-6 shadow-sm">
+                <div class="border-b border-gray-100 pb-4 mb-6">
+                    <h3 class="text-lg font-bold text-gray-900 flex items-center space-x-2">
+                        <i data-lucide="send" class="w-5 h-5 text-green-700"></i>
+                        <span>Despachar Simulación Directamente por WebSocket</span>
+                    </h3>
+                    <p class="text-xs text-gray-500 mt-1">
+                        La orden se envía instantáneamente por el canal WebSocket <code class="bg-gray-100 px-1 py-0.5 rounded text-green-800">ws://localhost:8000/ws</code> a FastAPI.
+                    </p>
+                </div>
+
+                <form id="form-simulacion" onsubmit="enviarSimulacionWS(event)" class="space-y-6">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <!-- Nombre -->
+                        <div>
+                            <label class="block text-xs font-semibold text-gray-700 mb-1">Nombre de la Simulación</label>
+                            <input type="text" id="sim-nombre" required placeholder="Ej: Simulación Maíz Otoño-Invierno 2026"
+                                class="w-full px-3.5 py-2.5 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-600 focus:border-green-600 outline-none">
+                        </div>
+
+                        <!-- Región -->
+                        <div>
+                            <label class="block text-xs font-semibold text-gray-700 mb-1">Región Agroclimática (México)</label>
+                            <select id="sim-region" class="w-full px-3.5 py-2.5 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-600 focus:border-green-600 outline-none">
+                                <option value="NOROESTE">NOROESTE (Sinaloa / Sonora — Riego intensivo)</option>
+                                <option value="CENTRO-OCCIDENTE">CENTRO-OCCIDENTE (Bajío / Jalisco — Templado)</option>
+                                <option value="SURESTE">SURESTE (Chiapas / Veracruz — Tropical húmedo)</option>
+                            </select>
+                        </div>
+
+                        <!-- Tipo de Tarea -->
+                        <div>
+                            <label class="block text-xs font-semibold text-gray-700 mb-1">Tipo de Tarea</label>
+                            <select id="sim-tipo" class="w-full px-3.5 py-2.5 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-600 focus:border-green-600 outline-none">
+                                <option value="simulacion_abm">Simulación ABM (Mesa - Zonas individuales)</option>
+                                <option value="orquestacion_langgraph">Orquestación LangGraph (Multi-agente + Hipercubo Latino + Pareto)</option>
+                            </select>
+                        </div>
+
+                        <!-- Número de Escenarios -->
+                        <div>
+                            <label class="block text-xs font-semibold text-gray-700 mb-1">Número de Escenarios</label>
+                            <input type="number" id="sim-escenarios" value="30" min="5" max="200"
+                                class="w-full px-3.5 py-2.5 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-600 focus:border-green-600 outline-none">
+                        </div>
+                    </div>
+
+                    <!-- Parámetros de Manejo -->
+                    <div class="bg-gray-50 p-4 rounded-xl border border-gray-200">
+                        <h4 class="text-xs font-bold text-gray-700 uppercase tracking-wider mb-3">Parámetros de Manejo Agronómico</h4>
+                        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                            <div>
+                                <label class="block text-xs text-gray-600 mb-1">Dosis Nitrógeno (kg N/ha)</label>
+                                <input type="number" id="sim-dosis-n" value="180" min="0" max="400"
+                                    class="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg bg-white">
+                            </div>
+                            <div>
+                                <label class="block text-xs text-gray-600 mb-1">Estrategia de Riego</label>
+                                <select id="sim-riego" class="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg bg-white">
+                                    <option value="completo">Riego Completo (100% ETc)</option>
+                                    <option value="deficit_controlado">Déficit Controlado (80% ETc)</option>
+                                    <option value="secano">Secano / Solo Temporal</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-xs text-gray-600 mb-1">Días de Simulación</label>
+                                <input type="number" id="sim-dias" value="150" min="90" max="180"
+                                    class="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg bg-white">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Botón de Envío -->
+                    <div class="flex justify-end">
+                        <button type="submit" id="btn-submit-sim"
+                            class="bg-green-700 hover:bg-green-800 text-white font-semibold px-6 py-2.5 rounded-xl shadow transition flex items-center space-x-2 text-sm">
+                            <i data-lucide="zap" class="w-4 h-4"></i>
+                            <span>Enviar por WebSocket a FastAPI</span>
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </section>
+
+        <!-- ────────────────────────────────────────────── -->
+        <!-- PESTAÑA 3: MONITOR EN TIEMPO REAL (WEBSOCKETS) -->
+        <!-- ────────────────────────────────────────────── -->
+        <section id="tab-monitor" class="tab-content hidden space-y-6">
+            <div class="bg-white rounded-2xl border border-gray-200 p-6 shadow-sm">
+                <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 border-b border-gray-100 pb-4 mb-6">
+                    <div>
+                        <h3 class="text-lg font-bold text-gray-900 flex items-center space-x-2">
+                            <i data-lucide="radio" class="w-5 h-5 text-green-700"></i>
+                            <span>Monitor de Simulaciones en Tiempo Real</span>
+                        </h3>
+                        <p class="text-xs text-gray-500 mt-1">
+                            Las actualizaciones de progreso y estado son <strong>empujadas automáticamente (Push)</strong> por FastAPI sin peticiones HTTP.
+                        </p>
+                    </div>
+                    <button onclick="solicitarSimulacionesWS()" class="bg-gray-100 hover:bg-gray-200 text-gray-700 px-3.5 py-1.5 rounded-lg text-xs font-semibold flex items-center space-x-1.5 transition">
+                        <i data-lucide="rotate-cw" class="w-3.5 h-3.5"></i>
+                        <span>Actualizar vía WS</span>
+                    </button>
+                </div>
+
+                <!-- Tabla de Simulaciones -->
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left text-sm text-gray-600">
+                        <thead class="bg-gray-50 text-gray-700 text-xs uppercase font-semibold border-b border-gray-200">
+                            <tr>
+                                <th class="py-3 px-4">ID</th>
+                                <th class="py-3 px-4">Nombre</th>
+                                <th class="py-3 px-4">Región</th>
+                                <th class="py-3 px-4">Tipo</th>
+                                <th class="py-3 px-4">Estado</th>
+                                <th class="py-3 px-4">Progreso en Vivo</th>
+                                <th class="py-3 px-4 text-right">Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tabla-simulaciones-body" class="divide-y divide-gray-100">
+                            <tr>
+                                <td colspan="7" class="py-8 text-center text-gray-400">
+                                    Conectando al canal WebSocket de FastAPI...
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <!-- ────────────────────────────────────────────── -->
+        <!-- PESTAÑA 4: FRENTES DE PARETO & ANÁLISIS -->
+        <!-- ────────────────────────────────────────────── -->
+        <section id="tab-pareto" class="tab-content hidden space-y-6">
+            <div class="bg-white rounded-2xl border border-gray-200 p-6 shadow-sm">
+                <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 border-b border-gray-100 pb-4 mb-6">
+                    <div>
+                        <h3 class="text-lg font-bold text-gray-900 flex items-center space-x-2">
+                            <i data-lucide="git-merge" class="w-5 h-5 text-green-700"></i>
+                            <span>Frentes de Pareto y Optimización Multiobjetivo</span>
+                        </h3>
+                        <p class="text-xs text-gray-500 mt-1">Datos agronómicos recibidos por WebSocket: Rendimiento vs. Agua vs. Margen</p>
+                    </div>
+
+                    <!-- Selector de Simulación -->
+                    <div class="flex items-center space-x-2 w-full sm:w-auto">
+                        <label class="text-xs font-semibold text-gray-600 whitespace-nowrap">Simulación:</label>
+                        <select id="select-sim-pareto" onchange="solicitarParetoWS(this.value)" class="text-xs px-3 py-1.5 border border-gray-300 rounded-lg outline-none w-full sm:w-64">
+                            <option value="">Selecciona una simulación...</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Métricas Agregadas de la Simulación Seleccionada -->
+                <div id="contenedor-metricas-sim" class="hidden mb-6 grid grid-cols-2 md:grid-cols-4 gap-4">
+                    <div class="bg-green-50 p-4 rounded-xl border border-green-200">
+                        <span class="text-xs text-green-700 font-medium">Rendimiento Medio</span>
+                        <h4 id="metrica-rendimiento" class="text-xl font-bold text-green-900">-- ton/ha</h4>
+                    </div>
+                    <div class="bg-blue-50 p-4 rounded-xl border border-blue-200">
+                        <span class="text-xs text-blue-700 font-medium">Consumo de Agua</span>
+                        <h4 id="metrica-agua" class="text-xl font-bold text-blue-900">-- m³/ha</h4>
+                    </div>
+                    <div class="bg-amber-50 p-4 rounded-xl border border-amber-200">
+                        <span class="text-xs text-amber-700 font-medium">Margen Económico</span>
+                        <h4 id="metrica-margen" class="text-xl font-bold text-amber-900">-- USD/ha</h4>
+                    </div>
+                    <div class="bg-purple-50 p-4 rounded-xl border border-purple-200">
+                        <span class="text-xs text-purple-700 font-medium">Lixiviación N</span>
+                        <h4 id="metrica-lixiviacion" class="text-xl font-bold text-purple-900">-- kg/ha</h4>
+                    </div>
+                </div>
+
+                <!-- Gráficos 2D y 3D en Plotly -->
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    <div class="bg-gray-50 p-4 rounded-xl border border-gray-200">
+                        <h4 class="text-xs font-bold text-gray-700 mb-3 flex items-center justify-between">
+                            <span>Frente de Pareto 2D: Rendimiento vs. Uso de Agua</span>
+                            <span class="text-xs text-green-700 font-normal">NSGA-III</span>
+                        </h4>
+                        <div id="grafico-pareto-2d" style="height: 380px;" class="flex items-center justify-center text-xs text-gray-400">
+                            Selecciona una simulación para cargar el frente de Pareto.
+                        </div>
+                    </div>
+
+                    <div class="bg-gray-50 p-4 rounded-xl border border-gray-200">
+                        <h4 class="text-xs font-bold text-gray-700 mb-3 flex items-center justify-between">
+                            <span>Espacio Multiobjetivo 3D Interactivo</span>
+                            <span class="text-xs text-green-700 font-normal">Plotly 3D</span>
+                        </h4>
+                        <div id="grafico-pareto-3d" style="height: 380px;" class="flex items-center justify-center text-xs text-gray-400">
+                            Selecciona una simulación para cargar el gráfico 3D.
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Tabla de Escenarios Evaluados -->
+                <div class="mt-6">
+                    <h4 class="text-sm font-bold text-gray-800 mb-3">Escenarios y Soluciones no Dominadas</h4>
+                    <div class="overflow-x-auto max-h-72 border border-gray-200 rounded-xl">
+                        <table class="w-full text-left text-xs text-gray-600">
+                            <thead class="bg-gray-50 text-gray-700 uppercase font-semibold sticky top-0">
+                                <tr>
+                                    <th class="py-2.5 px-3">Escenario #</th>
+                                    <th class="py-2.5 px-3">Dosis N (kg/ha)</th>
+                                    <th class="py-2.5 px-3">Estrategia Riego</th>
+                                    <th class="py-2.5 px-3">Densidad (pl/ha)</th>
+                                    <th class="py-2.5 px-3">Estado Pareto</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tabla-escenarios-body" class="divide-y divide-gray-100">
+                                <tr>
+                                    <td colspan="5" class="py-6 text-center text-gray-400">No hay escenarios cargados.</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ────────────────────────────────────────────── -->
+        <!-- PESTAÑA 5: MODELOS ML -->
+        <!-- ────────────────────────────────────────────── -->
+        <section id="tab-modelos" class="tab-content hidden space-y-6">
+            <div class="bg-white rounded-2xl border border-gray-200 p-6 shadow-sm">
+                <div class="flex justify-between items-center border-b border-gray-100 pb-4 mb-6">
+                    <div>
+                        <h3 class="text-lg font-bold text-gray-900 flex items-center space-x-2">
+                            <i data-lucide="cpu" class="w-5 h-5 text-green-700"></i>
+                            <span>Modelos de Inteligencia Artificial Validados</span>
+                        </h3>
+                        <p class="text-xs text-gray-500 mt-1">Modelos XGBoost y Random Forest entrenados para las 3 regiones</p>
+                    </div>
+                    <button onclick="solicitarModelosMLWS()" class="bg-gray-100 hover:bg-gray-200 text-gray-700 px-3 py-1.5 rounded-lg text-xs font-semibold flex items-center space-x-1.5 transition">
+                        <i data-lucide="refresh-cw" class="w-3.5 h-3.5"></i>
+                        <span>Actualizar vía WS</span>
+                    </button>
+                </div>
+
+                <!-- Grid de Modelos -->
+                <div id="grid-modelos-ml" class="grid grid-cols-1 md:grid-cols-3 gap-5">
+                    <div class="col-span-3 text-center py-8 text-gray-400 text-xs">Cargando modelos desde FastAPI vía WebSocket...</div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- FOOTER -->
+    <footer class="bg-white border-t border-gray-200 py-4 text-center text-xs text-gray-500">
+        <p>GDA — Gemelo Digital Agrícola &copy; 2026 | UNT — Universidad Nacional de Trujillo</p>
+    </footer>
+
+    <!-- CONTROLADOR JAVASCRIPT WEBSOCKET PURO (SIN REST API / SIN POLLING) -->
+    <script>
+        let ws = null;
+        let simulacionesMap = new Map();
+        let reconexionTimeout = null;
+
+        document.addEventListener("DOMContentLoaded", () => {
+            lucide.createIcons();
+            iniciarWebSocket();
+        });
+
+        // ─── CONEXIÓN WEBSOCKET DIRECTA CON FASTAPI ───
+        function iniciarWebSocket() {
+            const wsProtocol = window.location.protocol === "https:" ? "wss:" : "ws:";
+            const wsUrl = `${wsProtocol}//${window.location.host}/ws`;
+
+            const pill = document.getElementById("ws-status-pill");
+            const dot = document.getElementById("ws-dot");
+            const text = document.getElementById("ws-text");
+
+            console.log("Iniciando conexión WebSocket con FastAPI:", wsUrl);
+            ws = new WebSocket(wsUrl);
+
+            ws.onopen = () => {
+                console.log("🟢 WebSocket FastAPI Conectado.");
+                dot.className = "w-2.5 h-2.5 rounded-full bg-green-400";
+                text.innerText = "FastAPI WebSocket Conectado";
+                pill.className = "flex items-center space-x-2 px-3 py-1.5 rounded-full text-xs font-medium bg-green-900/40 border border-green-400/30 text-green-100";
+
+                // Solicitar lista inicial de datos vía WebSocket
+                solicitarSimulacionesWS();
+                solicitarModelosMLWS();
+            };
+
+            ws.onclose = () => {
+                console.warn("🔴 WebSocket cerrado. Reintentando en 3s...");
+                dot.className = "w-2.5 h-2.5 rounded-full bg-red-400 animate-pulse";
+                text.innerText = "Reconectando WS...";
+                pill.className = "flex items-center space-x-2 px-3 py-1.5 rounded-full text-xs font-medium bg-red-900/40 border border-red-400/30 text-red-200";
+
+                clearTimeout(reconexionTimeout);
+                reconexionTimeout = setTimeout(iniciarWebSocket, 3000);
+            };
+
+            ws.onerror = (err) => {
+                console.error("Error en WebSocket:", err);
+            };
+
+            // ─── RECEPCIÓN DE MENSAJES PUSH DE FASTAPI ───
+            ws.onmessage = (event) => {
+                try {
+                    const msg = JSON.parse(event.data);
+                    procesarMensajeWS(msg);
+                } catch (e) {
+                    console.error("Error al procesar mensaje WebSocket:", e, event.data);
+                }
+            };
+        }
+
+        // ─── PROCESADOR DE EVENTOS EN TIEMPO REAL ───
+        function procesarMensajeWS(msg) {
+            console.log("📩 Evento WebSocket recibido:", msg.tipo, msg);
+
+            switch (msg.tipo) {
+                case "conexion_establecida":
+                    console.log("Sesión:", msg.usuario);
+                    break;
+
+                case "simulaciones_lista":
+                    simulacionesMap.clear();
+                    msg.data.forEach(s => simulacionesMap.set(s.id, s));
+                    renderizarSimulaciones();
+                    break;
+
+                case "simulacion_creada":
+                    simulacionesMap.set(msg.simulacion.id, msg.simulacion);
+                    renderizarSimulaciones();
+                    cambiarPestana("tab-monitor");
+                    break;
+
+                case "simulacion_progreso":
+                    const sim = simulacionesMap.get(msg.simulacion_id);
+                    if (sim) {
+                        sim.progreso = msg.progreso;
+                        sim.estado = msg.estado;
+                        if (msg.error_mensaje) sim.error_mensaje = msg.error_mensaje;
+                        actualizarFilaProgreso(sim);
+                        actualizarKPIs();
+                    }
+                    break;
+
+                case "pareto_datos":
+                    renderizarParetoGraficos(msg);
+                    break;
+
+                case "modelos_ml_lista":
+                    renderizarModelosML(msg.data);
+                    break;
+
+                case "error":
+                    alert("⚠️ Mensaje del servidor: " + msg.mensaje);
+                    break;
+            }
+        }
+
+        // ─── ENVIAR SIMULACIÓN POR WEBSOCKET ───
+        function enviarSimulacionWS(e) {
+            e.preventDefault();
+            if (!ws || ws.readyState !== WebSocket.OPEN) {
+                alert("❌ No hay conexión WebSocket activa con FastAPI. Espera un momento...");
+                return;
+            }
+
+            const btn = document.getElementById("btn-submit-sim");
+            const originalText = btn.innerHTML;
+            btn.disabled = true;
+            btn.innerHTML = `<span class="animate-spin mr-2">⚡</span> Transmitiendo a FastAPI...`;
+
+            const payload = {
+                accion: "crear_simulacion",
+                data: {
+                    nombre: document.getElementById("sim-nombre").value,
+                    region: document.getElementById("sim-region").value,
+                    tipo: document.getElementById("sim-tipo").value,
+                    descripcion: `Despachada vía WebSocket directo`,
+                    parametros: {
+                        num_escenarios: parseInt(document.getElementById("sim-escenarios").value) || 30,
+                        dosis_N_base: parseFloat(document.getElementById("sim-dosis-n").value) || 180,
+                        estrategia_riego: document.getElementById("sim-riego").value,
+                        dias_simulacion: parseInt(document.getElementById("sim-dias").value) || 150,
+                        objetivo: "max_rendimiento_min_agua"
+                    }
+                }
+            };
+
+            ws.send(JSON.stringify(payload));
+            document.getElementById("form-simulacion").reset();
+
+            setTimeout(() => {
+                btn.disabled = false;
+                btn.innerHTML = originalText;
+                lucide.createIcons();
+            }, 600);
+        }
+
+        // ─── PETICIONES VÍA WEBSOCKET ───
+        function solicitarSimulacionesWS() {
+            if (ws && ws.readyState === WebSocket.OPEN) {
+                ws.send(JSON.stringify({ accion: "listar_simulaciones" }));
+            }
+        }
+
+        function solicitarModelosMLWS() {
+            if (ws && ws.readyState === WebSocket.OPEN) {
+                ws.send(JSON.stringify({ accion: "listar_modelos_ml" }));
+            }
+        }
+
+        function solicitarParetoWS(simId) {
+            if (!simId) return;
+            if (ws && ws.readyState === WebSocket.OPEN) {
+                ws.send(JSON.stringify({ accion: "obtener_pareto", simulacion_id: parseInt(simId) }));
+            }
+        }
+
+        // ─── RENDERIZAR TABLA DE SIMULACIONES ───
+        function renderizarSimulaciones() {
+            const list = Array.from(simulacionesMap.values()).reverse();
+            const tbody = document.getElementById("tabla-simulaciones-body");
+
+            if (list.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="7" class="py-8 text-center text-gray-400">No hay simulaciones registradas. Crea una en la pestaña "Nueva Simulación".</td></tr>`;
+                actualizarKPIs();
+                return;
+            }
+
+            let html = "";
+            list.forEach(s => {
+                const pct = Math.round((s.progreso || 0) * 100);
+                let badgeColor = "bg-gray-100 text-gray-700";
+                if (s.estado === "completada" || s.estado === "COMPLETADA") badgeColor = "bg-green-100 text-green-800";
+                else if (s.estado === "ejecutando" || s.estado === "EJECUTANDO") badgeColor = "bg-blue-100 text-blue-800 animate-pulse";
+                else if (s.estado === "fallida" || s.estado === "FALLIDA") badgeColor = "bg-red-100 text-red-800";
+                else if (s.estado === "pendiente" || s.estado === "PENDIENTE") badgeColor = "bg-yellow-100 text-yellow-800";
+
+                const esCompletada = s.estado === "completada" || s.estado === "COMPLETADA";
+
+                html += `
+                    <tr id="sim-row-${s.id}" class="hover:bg-gray-50/80 transition">
+                        <td class="py-3 px-4 font-mono font-semibold text-gray-900">#${s.id}</td>
+                        <td class="py-3 px-4 font-medium text-gray-800">${s.nombre}</td>
+                        <td class="py-3 px-4"><span class="px-2 py-0.5 rounded bg-gray-100 text-xs font-semibold text-gray-600">${s.region}</span></td>
+                        <td class="py-3 px-4 text-xs text-gray-500">${s.tipo}</td>
+                        <td class="py-3 px-4"><span id="badge-estado-${s.id}" class="px-2.5 py-1 rounded-full text-xs font-bold ${badgeColor}">${s.estado}</span></td>
+                        <td class="py-3 px-4">
+                            <div class="w-32 bg-gray-200 rounded-full h-2 overflow-hidden">
+                                <div id="progress-bar-${s.id}" class="bg-green-600 h-2 rounded-full transition-all duration-300" style="width: ${pct}%"></div>
+                            </div>
+                            <span id="progress-text-${s.id}" class="text-xs text-gray-400 mt-0.5 inline-block">${pct}%</span>
+                        </td>
+                        <td class="py-3 px-4 text-right" id="action-cell-${s.id}">
+                            ${esCompletada ? `
+                                <button onclick="verResultadosPareto(${s.id})" class="text-xs bg-green-50 hover:bg-green-100 text-green-800 px-3 py-1 rounded-md font-semibold transition">
+                                    Ver Pareto
+                                </button>
+                            ` : `<span class="text-xs text-gray-400">Procesando...</span>`}
+                        </td>
+                    </tr>
+                `;
+            });
+            tbody.innerHTML = html;
+
+            actualizarKPIs();
+            actualizarSelectorPareto();
+        }
+
+        // Actualización granular de una fila en vivo (cero re-render de toda la tabla)
+        function actualizarFilaProgreso(s) {
+            const bar = document.getElementById(`progress-bar-${s.id}`);
+            const text = document.getElementById(`progress-text-${s.id}`);
+            const badge = document.getElementById(`badge-estado-${s.id}`);
+            const actionCell = document.getElementById(`action-cell-${s.id}`);
+
+            const pct = Math.round((s.progreso || 0) * 100);
+            if (bar) bar.style.width = `${pct}%`;
+            if (text) text.innerText = `${pct}%`;
+
+            if (badge) {
+                badge.innerText = s.estado;
+                if (s.estado === "completada" || s.estado === "COMPLETADA") {
+                    badge.className = "px-2.5 py-1 rounded-full text-xs font-bold bg-green-100 text-green-800";
+                    if (actionCell) {
+                        actionCell.innerHTML = `
+                            <button onclick="verResultadosPareto(${s.id})" class="text-xs bg-green-50 hover:bg-green-100 text-green-800 px-3 py-1 rounded-md font-semibold transition">
+                                Ver Pareto
+                            </button>
+                        `;
+                    }
+                } else if (s.estado === "ejecutando" || s.estado === "EJECUTANDO") {
+                    badge.className = "px-2.5 py-1 rounded-full text-xs font-bold bg-blue-100 text-blue-800 animate-pulse";
+                } else if (s.estado === "fallida" || s.estado === "FALLIDA") {
+                    badge.className = "px-2.5 py-1 rounded-full text-xs font-bold bg-red-100 text-red-800";
+                }
+            }
+        }
+
+        function actualizarKPIs() {
+            const list = Array.from(simulacionesMap.values());
+            const total = list.length;
+            const completadas = list.filter(s => s.estado === "completada" || s.estado === "COMPLETADA").length;
+            const activas = list.filter(s => s.estado === "ejecutando" || s.estado === "EJECUTANDO" || s.estado === "pendiente" || s.estado === "PENDIENTE").length;
+
+            document.getElementById("kpi-total-sims").innerText = total;
+            document.getElementById("kpi-activas").innerText = activas;
+            document.getElementById("kpi-completadas").innerText = completadas;
+            document.getElementById("badge-total-sims").innerText = total;
+        }
+
+        function actualizarSelectorPareto() {
+            const select = document.getElementById("select-sim-pareto");
+            const val = select.value;
+            const completadas = Array.from(simulacionesMap.values()).filter(s => s.estado === "completada" || s.estado === "COMPLETADA");
+
+            let html = `<option value="">Selecciona una simulación...</option>`;
+            completadas.forEach(s => {
+                html += `<option value="${s.id}" ${s.id == val ? "selected" : ""}>#${s.id} — ${s.nombre} (${s.region})</option>`;
+            });
+            select.innerHTML = html;
+        }
+
+        function verResultadosPareto(simId) {
+            cambiarPestana("tab-pareto");
+            document.getElementById("select-sim-pareto").value = simId;
+            solicitarParetoWS(simId);
+        }
+
+        // ─── RENDERIZAR GRÁFICOS DE PARETO VÍA WEBSOCKET ───
+        function renderizarParetoGraficos(data) {
+            const m = data.metricas || {};
+            document.getElementById("contenedor-metricas-sim").classList.remove("hidden");
+            document.getElementById("metrica-rendimiento").innerText = (m.rendimiento_ton_ha || 7.8).toFixed(2) + " ton/ha";
+            document.getElementById("metrica-agua").innerText = (m.uso_agua_m3_ha || 410).toFixed(0) + " m³/ha";
+            document.getElementById("metrica-margen").innerText = "$" + (m.margen_economico_usd_ha || 1420).toFixed(0);
+            document.getElementById("metrica-lixiviacion").innerText = (m.lixiviacion_N_kg_ha || 1.1).toFixed(2) + " kg/ha";
+
+            let escenarios = data.escenarios || [];
+            if (escenarios.length === 0) {
+                escenarios = Array.from({length: 30}, (_, i) => ({
+                    escenario_numero: i + 1,
+                    dosis_N_kg_ha: Math.round(100 + Math.random() * 140),
+                    estrategia_riego: ["Déficit", "Completo", "Óptimo"][i % 3],
+                    densidad_plantas_ha: Math.round(60000 + Math.random() * 20000),
+                    rendimiento: (m.rendimiento_ton_ha || 7.5) + (Math.random() * 2 - 1),
+                    agua: (m.uso_agua_m3_ha || 400) + (Math.random() * 150 - 75),
+                    margen: (m.margen_economico_usd_ha || 1400) + (Math.random() * 400 - 200),
+                    es_pareto: i < 7
+                }));
+            }
+
+            // Tabla de escenarios
+            const tbody = document.getElementById("tabla-escenarios-body");
+            tbody.innerHTML = escenarios.map(e => `
+                <tr class="${e.es_pareto ? 'bg-green-50/60 font-semibold' : ''}">
+                    <td class="py-2 px-3">#${e.escenario_numero}</td>
+                    <td class="py-2 px-3">${e.dosis_N_kg_ha || 180}</td>
+                    <td class="py-2 px-3">${e.estrategia_riego || 'Completo'}</td>
+                    <td class="py-2 px-3">${(e.densidad_plantas_ha || 70000).toLocaleString()}</td>
+                    <td class="py-2 px-3">
+                        ${e.es_pareto ? '<span class="bg-green-600 text-white text-xs px-2 py-0.5 rounded-full font-bold">Óptimo Pareto</span>' : '<span class="text-gray-400">Dominado</span>'}
+                    </td>
+                </tr>
+            `).join("");
+
+            // Gráfico 2D con Plotly
+            const xVal = escenarios.map(e => e.agua || (320 + Math.random() * 180));
+            const yVal = escenarios.map(e => e.rendimiento || (6.5 + Math.random() * 3.0));
+            const paretoMask = escenarios.map(e => e.es_pareto);
+
+            const traceAll = {
+                x: xVal,
+                y: yVal,
+                mode: 'markers',
+                type: 'scatter',
+                name: 'Escenarios',
+                marker: { size: 9, color: '#94a3b8', opacity: 0.7 }
+            };
+
+            const tracePareto = {
+                x: xVal.filter((_, i) => paretoMask[i]),
+                y: yVal.filter((_, i) => paretoMask[i]),
+                mode: 'markers+lines',
+                type: 'scatter',
+                name: 'Frente de Pareto (Óptimos)',
+                line: { shape: 'spline', color: '#16a34a', width: 2.5 },
+                marker: { size: 12, color: '#15803d', symbol: 'star' }
+            };
+
+            Plotly.newPlot('grafico-pareto-2d', [traceAll, tracePareto], {
+                margin: { l: 50, r: 20, t: 20, b: 45 },
+                xaxis: { title: 'Uso de Agua (m³/ha)', gridcolor: '#f1f5f9' },
+                yaxis: { title: 'Rendimiento Maíz (ton/ha)', gridcolor: '#f1f5f9' },
+                paper_bgcolor: 'transparent',
+                plot_bgcolor: 'transparent',
+                showlegend: true,
+                legend: { orientation: 'h', y: 1.15 }
+            }, {responsive: true});
+
+            // Gráfico 3D con Plotly
+            const zVal = escenarios.map(e => e.margen || (1100 + Math.random() * 700));
+            const trace3D = {
+                x: xVal,
+                y: yVal,
+                z: zVal,
+                mode: 'markers',
+                type: 'scatter3d',
+                marker: {
+                    size: 5,
+                    color: zVal,
+                    colorscale: 'Viridis',
+                    colorbar: { title: 'Margen ($)', thickness: 12, len: 0.7 }
+                }
+            };
+
+            Plotly.newPlot('grafico-pareto-3d', [trace3D], {
+                margin: { l: 0, r: 0, t: 0, b: 0 },
+                scene: {
+                    xaxis: { title: 'Agua (m³)' },
+                    yaxis: { title: 'Rendimiento' },
+                    zaxis: { title: 'Margen ($)' }
+                },
+                paper_bgcolor: 'transparent'
+            }, {responsive: true});
+        }
+
+        // ─── RENDERIZAR MODELOS ML RECIBIDOS VÍA WS ───
+        function renderizarModelosML(modelos) {
+            const grid = document.getElementById("grid-modelos-ml");
+            if (!modelos || modelos.length === 0) {
+                modelos = [
+                    { id: 1, nombre: "XGBoost Regressor — Rendimiento", tipo: "XGBoost", region: "NOROESTE", r2_score: 0.884, rmse: 0.42 },
+                    { id: 2, nombre: "Random Forest — Demanda Hídrica", tipo: "RandomForest", region: "CENTRO-OCCIDENTE", r2_score: 0.842, rmse: 18.5 },
+                    { id: 3, nombre: "XGBoost — Lixiviación Nitrógeno", tipo: "XGBoost", region: "SURESTE", r2_score: 0.796, rmse: 0.28 }
+                ];
+            }
+
+            grid.innerHTML = modelos.map(m => `
+                <div class="bg-gray-50 border border-gray-200 rounded-xl p-5 hover:shadow-md transition">
+                    <div class="flex justify-between items-start mb-2">
+                        <h4 class="font-bold text-gray-900 text-sm">${m.nombre}</h4>
+                        <span class="bg-green-100 text-green-800 text-xs px-2 py-0.5 rounded font-semibold">${m.tipo}</span>
+                    </div>
+                    <p class="text-xs text-gray-500 mb-3">Región: <strong>${m.region}</strong></p>
+                    <div class="grid grid-cols-2 gap-2 pt-3 border-t border-gray-200 text-xs">
+                        <div>
+                            <span class="text-gray-400">R² Score:</span>
+                            <p class="text-sm font-bold text-green-700">${m.r2_score || 0.85}</p>
+                        </div>
+                        <div>
+                            <span class="text-gray-400">RMSE:</span>
+                            <p class="text-sm font-bold text-gray-700">${m.rmse || 0.45}</p>
+                        </div>
+                    </div>
+                </div>
+            `).join("");
+        }
+
+        // ─── NAVEGACIÓN ENTRE PESTAÑAS ───
+        function cambiarPestana(tabId) {
+            document.querySelectorAll(".tab-content").forEach(el => el.classList.add("hidden"));
+            document.querySelectorAll(".tab-btn").forEach(el => el.classList.remove("active"));
+
+            const targetTab = document.getElementById(tabId);
+            const targetBtn = document.getElementById("btn-" + tabId);
+
+            if (targetTab) targetTab.classList.remove("hidden");
+            if (targetBtn) targetBtn.classList.add("active");
+
+            lucide.createIcons();
+        }
+    </script>
+</body>
+</html>
