@@ -418,7 +418,16 @@ export const VisorGemeloDigital3D: React.FC<VisorGemeloDigital3DProps> = ({ zona
             ]
           : colorscaleCanopia,
         showscale: modoVisual !== 'realista',
-        colorbar: { title: { text: colorbarTitle }, len: 0.65, x: 1.02 },
+        colorbar: {
+          title: { text: colorbarTitle, side: 'top', font: { size: 11, color: '#f8fafc' } },
+          len: 0.55,
+          y: 0.5,
+          x: 1.05,
+          thickness: 16,
+          outlinewidth: 1,
+          outlinecolor: 'rgba(255,255,255,0.2)',
+          tickfont: { size: 10, color: '#94a3b8' },
+        },
         opacity: modoVisual === 'realista' ? 0.95 : 0.85,
         lighting: { ambient: 0.7, diffuse: 0.8, roughness: 0.9, specular: 0.1 },
         name: 'Topografía del Suelo',
@@ -436,7 +445,16 @@ export const VisorGemeloDigital3D: React.FC<VisorGemeloDigital3DProps> = ({ zona
         surfacecolor: datos3D.canopyColors,
         colorscale: colorscaleCanopia,
         showscale: true,
-        colorbar: { title: { text: 'Vigor Dosel' }, len: 0.65, x: 1.02 },
+        colorbar: {
+          title: { text: 'Vigor Dosel', side: 'top', font: { size: 11, color: '#f8fafc' } },
+          len: 0.55,
+          y: 0.5,
+          x: 1.05,
+          thickness: 16,
+          outlinewidth: 1,
+          outlinecolor: 'rgba(255,255,255,0.2)',
+          tickfont: { size: 10, color: '#94a3b8' },
+        },
         opacity: 0.78,
         lighting: { ambient: 0.8, diffuse: 0.9, roughness: 0.6, specular: 0.2 },
         name: 'Dosel de Maíz',
@@ -455,7 +473,7 @@ export const VisorGemeloDigital3D: React.FC<VisorGemeloDigital3DProps> = ({ zona
           z: line.z,
           line: { color: 'rgba(92, 64, 42, 0.65)', width: 2.5 },
           showlegend: idx === 0,
-          name: 'Surcos de Maíz (75cm)',
+          name: 'Surcos (75cm)',
           hoverinfo: 'none',
         });
       });
@@ -477,7 +495,7 @@ export const VisorGemeloDigital3D: React.FC<VisorGemeloDigital3DProps> = ({ zona
           symbol: 'circle',
           opacity: 0.92,
         },
-        name: 'Plantas de Maíz',
+        name: 'Plantas Maíz',
       });
 
       // Espigas / Panojas de Floración Doradas
@@ -496,7 +514,7 @@ export const VisorGemeloDigital3D: React.FC<VisorGemeloDigital3DProps> = ({ zona
             symbol: 'diamond',
             line: { color: '#b45309', width: 1 },
           },
-          name: 'Espigas Doradas (R1)',
+          name: 'Espigas (R1)',
         });
       }
     }
@@ -526,7 +544,7 @@ export const VisorGemeloDigital3D: React.FC<VisorGemeloDigital3DProps> = ({ zona
         symbol: 'square',
         line: { color: '#ffffff', width: 2 },
       },
-      name: 'Zonas de Manejo (ABM)',
+      name: 'Zonas ABM',
     });
 
     // CAPA 6: Balizas 3D de Alerta Roja
@@ -546,7 +564,7 @@ export const VisorGemeloDigital3D: React.FC<VisorGemeloDigital3DProps> = ({ zona
           symbol: 'diamond',
           line: { color: '#ffffff', width: 3 },
         },
-        name: 'Baliza Alerta Roja (≥70%)',
+        name: 'Alerta Roja (≥70%)',
         hoverinfo: 'text',
         hovertext: datos3D.alertText,
       });
@@ -561,7 +579,7 @@ export const VisorGemeloDigital3D: React.FC<VisorGemeloDigital3DProps> = ({ zona
         y: datos3D.riegoManifoldY,
         z: datos3D.riegoManifoldZ,
         line: { color: '#0284c7', width: 6 },
-        name: 'Tubería Matriz de Riego',
+        name: 'Riego Matriz',
         hoverinfo: 'name',
       });
     }
@@ -576,7 +594,7 @@ export const VisorGemeloDigital3D: React.FC<VisorGemeloDigital3DProps> = ({ zona
         z: datos3D.estacionMastZ,
         line: { color: '#f59e0b', width: 4 },
         marker: { size: 8, color: '#f59e0b', symbol: 'cross' },
-        name: 'Estación IoT + Sondas FDR',
+        name: 'Estación IoT',
         hoverinfo: 'text',
         hovertext: ['Sondas FDR Subterráneas (30/60/90 cm)', 'Torre Agrometeorológica IoT (Radiación, Viento, Temp, HR)'],
       });
@@ -636,7 +654,7 @@ export const VisorGemeloDigital3D: React.FC<VisorGemeloDigital3DProps> = ({ zona
             </span>
           </div>
 
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: '0.5rem' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: '0.75rem', marginTop: '0.5rem' }}>
             {(Object.keys(ETAPAS_MAIZ) as EtapaFenologica[]).map(et => {
               const info = ETAPAS_MAIZ[et];
               const isSelected = etapa === et;
@@ -649,15 +667,17 @@ export const VisorGemeloDigital3D: React.FC<VisorGemeloDigital3DProps> = ({ zona
                     display: 'flex',
                     flexDirection: 'column',
                     alignItems: 'center',
-                    padding: '0.5rem',
+                    padding: '0.75rem 0.5rem',
                     textAlign: 'center',
-                    border: isSelected ? '1px solid #3b82f6' : '1px solid rgba(255,255,255,0.08)',
-                    borderRadius: '0.5rem',
+                    border: isSelected ? '1.5px solid #3b82f6' : '1px solid rgba(255,255,255,0.08)',
+                    borderRadius: '0.65rem',
+                    boxShadow: isSelected ? '0 0 16px rgba(59, 130, 246, 0.35)' : 'none',
+                    transition: 'all 0.2s ease',
                   }}
                 >
-                  <span style={{ fontSize: '1.2rem', marginBottom: '0.2rem' }}>{info.icono}</span>
-                  <span style={{ fontWeight: 600, fontSize: '0.82rem' }}>{et}</span>
-                  <span style={{ fontSize: '0.68rem', color: isSelected ? '#e2e8f0' : '#94a3b8' }}>
+                  <span style={{ fontSize: '1.35rem', marginBottom: '0.25rem' }}>{info.icono}</span>
+                  <span style={{ fontWeight: 700, fontSize: '0.85rem' }}>{et}</span>
+                  <span style={{ fontSize: '0.72rem', color: isSelected ? '#e2e8f0' : '#94a3b8', marginTop: '0.15rem' }}>
                     {info.alturaBaseM} m
                   </span>
                 </button>
@@ -704,92 +724,108 @@ export const VisorGemeloDigital3D: React.FC<VisorGemeloDigital3DProps> = ({ zona
 
       {/* ─── VISOR 3D Y CONTROLES DE CAPAS ─── */}
       <div className="glass-panel">
-        <div className="flex-between-panel" style={{ marginBottom: '1rem', flexWrap: 'wrap', gap: '0.75rem' }}>
-          {/* SELECTOR DE MODO VISUAL */}
-          <div>
-            <span style={{ fontSize: '0.75rem', color: '#94a3b8', display: 'block', marginBottom: '0.35rem' }}>
-              MODO DE RENDERIZADO DEL GEMELO:
+        {/* BARRA DE CONTROLES DEL VISOR (MODOS Y CAPAS) */}
+        <div style={{
+          display: 'flex',
+          flexDirection: 'column',
+          gap: '1rem',
+          padding: '1.1rem 1.25rem',
+          background: 'rgba(15, 23, 42, 0.55)',
+          borderRadius: '0.85rem',
+          border: '1px solid rgba(255, 255, 255, 0.08)',
+          marginBottom: '1.25rem'
+        }}>
+          {/* Fila 1: Modo de Renderizado */}
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '0.75rem' }}>
+            <span style={{ fontSize: '0.78rem', fontWeight: 700, color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
+              🎨 Modo de Renderizado del Gemelo:
             </span>
-            <div className="view-toggle-btns" style={{ display: 'inline-flex', gap: '0.3rem' }}>
+            <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
               <button
                 onClick={() => setModoVisual('realista')}
                 className={`btn btn-sm ${modoVisual === 'realista' ? 'btn-primary' : 'btn-secondary'}`}
+                style={{ padding: '0.4rem 0.85rem', fontSize: '0.82rem' }}
               >
                 🌽 Campo Realista
               </button>
               <button
                 onClick={() => setModoVisual('ndvi')}
                 className={`btn btn-sm ${modoVisual === 'ndvi' ? 'btn-primary' : 'btn-secondary'}`}
+                style={{ padding: '0.4rem 0.85rem', fontSize: '0.82rem' }}
               >
                 🌿 NDVI Multiespectral
               </button>
               <button
                 onClick={() => setModoVisual('estres_hidrico')}
                 className={`btn btn-sm ${modoVisual === 'estres_hidrico' ? 'btn-primary' : 'btn-secondary'}`}
+                style={{ padding: '0.4rem 0.85rem', fontSize: '0.82rem' }}
               >
                 💧 Estrés Hídrico %
               </button>
               <button
                 onClick={() => setModoVisual('rendimiento')}
                 className={`btn btn-sm ${modoVisual === 'rendimiento' ? 'btn-primary' : 'btn-secondary'}`}
+                style={{ padding: '0.4rem 0.85rem', fontSize: '0.82rem' }}
               >
                 🌾 Rendimiento ton/ha
               </button>
             </div>
           </div>
 
-          {/* INTERRUPTORES DE CAPAS */}
-          <div>
-            <span style={{ fontSize: '0.75rem', color: '#94a3b8', display: 'block', marginBottom: '0.35rem' }}>
-              CAPAS AGRONÓMICAS VISIBLES:
+          <div style={{ height: '1px', background: 'rgba(255, 255, 255, 0.06)' }} />
+
+          {/* Fila 2: Capas Agronómicas */}
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '0.75rem' }}>
+            <span style={{ fontSize: '0.78rem', fontWeight: 700, color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
+              👁️ Capas Agronómicas Visibles:
             </span>
-            <div style={{ display: 'flex', gap: '0.4rem', flexWrap: 'wrap' }}>
+            <div style={{ display: 'flex', gap: '0.45rem', flexWrap: 'wrap' }}>
               <button
                 onClick={() => setMostrarPlantas(p => !p)}
                 className={`btn btn-sm ${mostrarPlantas ? 'btn-primary' : 'btn-secondary'}`}
-                style={{ fontSize: '0.78rem', padding: '0.3rem 0.6rem' }}
+                style={{ fontSize: '0.8rem', padding: '0.35rem 0.75rem' }}
               >
                 🌽 Plantas
               </button>
               <button
                 onClick={() => setMostrarSurcos(s => !s)}
                 className={`btn btn-sm ${mostrarSurcos ? 'btn-primary' : 'btn-secondary'}`}
-                style={{ fontSize: '0.78rem', padding: '0.3rem 0.6rem' }}
+                style={{ fontSize: '0.8rem', padding: '0.35rem 0.75rem' }}
               >
                 〰️ Surcos
               </button>
               <button
                 onClick={() => setMostrarTerreno(t => !t)}
                 className={`btn btn-sm ${mostrarTerreno ? 'btn-primary' : 'btn-secondary'}`}
-                style={{ fontSize: '0.78rem', padding: '0.3rem 0.6rem' }}
+                style={{ fontSize: '0.8rem', padding: '0.35rem 0.75rem' }}
               >
                 ⛰️ Suelo
               </button>
               <button
                 onClick={() => setMostrarRiego(r => !r)}
                 className={`btn btn-sm ${mostrarRiego ? 'btn-primary' : 'btn-secondary'}`}
-                style={{ fontSize: '0.78rem', padding: '0.3rem 0.6rem' }}
+                style={{ fontSize: '0.8rem', padding: '0.35rem 0.75rem' }}
               >
                 💧 Riego
               </button>
               <button
                 onClick={() => setMostrarAlertas(a => !a)}
                 className={`btn btn-sm ${mostrarAlertas ? 'btn-primary' : 'btn-secondary'}`}
-                style={{ fontSize: '0.78rem', padding: '0.3rem 0.6rem' }}
+                style={{ fontSize: '0.8rem', padding: '0.35rem 0.75rem' }}
               >
                 🚨 Alertas 3D
               </button>
               <button
                 onClick={() => setMostrarSensores(s => !s)}
                 className={`btn btn-sm ${mostrarSensores ? 'btn-primary' : 'btn-secondary'}`}
-                style={{ fontSize: '0.78rem', padding: '0.3rem 0.6rem' }}
+                style={{ fontSize: '0.8rem', padding: '0.35rem 0.75rem' }}
               >
                 📡 Sensores IoT
               </button>
               <button
                 onClick={() => setVista3D(v => !v)}
                 className="btn btn-sm btn-secondary"
-                style={{ fontSize: '0.78rem', padding: '0.3rem 0.6rem' }}
+                style={{ fontSize: '0.8rem', padding: '0.35rem 0.75rem', borderColor: '#38bdf8' }}
               >
                 {vista3D ? '📐 Plano 2D' : '🌐 Perspectiva 3D'}
               </button>
@@ -803,11 +839,30 @@ export const VisorGemeloDigital3D: React.FC<VisorGemeloDigital3DProps> = ({ zona
             <Plot
               data={plotData}
               layout={{
-                height: 540,
+                height: 620,
                 paper_bgcolor: 'transparent',
                 plot_bgcolor: 'transparent',
                 font: { color: '#f8fafc', size: 11 },
-                margin: { l: 0, r: 0, t: 10, b: 10 },
+                margin: { l: 25, r: 95, t: 30, b: 85 },
+                legend: {
+                  orientation: 'h',
+                  yanchor: 'top',
+                  y: -0.08,
+                  xanchor: 'center',
+                  x: 0.5,
+                  bgcolor: 'rgba(15, 23, 42, 0.92)',
+                  bordercolor: 'rgba(255, 255, 255, 0.18)',
+                  borderwidth: 1,
+                  font: { size: 11, color: '#f1f5f9' },
+                  itemsizing: 'constant',
+                  itemgap: 18,
+                },
+                modebar: {
+                  orientation: 'h',
+                  bgcolor: 'rgba(15, 23, 42, 0.85)',
+                  color: '#94a3b8',
+                  activecolor: '#10b981',
+                },
                 scene: {
                   xaxis: {
                     title: { text: 'Metros Este (X)' },

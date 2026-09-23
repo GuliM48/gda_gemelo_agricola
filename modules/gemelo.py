@@ -326,7 +326,12 @@ def interfaz_gemelo():
             x=GX, y=GY, z=Z_canopia,
             surfacecolor=NDVI_campo,
             colorscale=[[0.0, "#3f2e1a"], [0.35, "#a16207"], [0.6, "#65a30d"], [0.8, "#16a34a"], [1.0, "#14532d"]],
-            showscale=True, colorbar=dict(title="Vigor Foliar", len=0.6, x=1.02),
+            showscale=True,
+            colorbar=dict(
+                title=dict(text="Vigor Dosel", side="top"),
+                len=0.55, y=0.5, x=1.05, thickness=16,
+                outlinewidth=1
+            ),
             opacity=0.82,
             lighting=dict(ambient=0.8, diffuse=0.9, roughness=0.6, specular=0.2),
             name="Dosel de Maíz (Canopia)", hoverinfo="none"
@@ -341,7 +346,12 @@ def interfaz_gemelo():
             x=GX, y=GY, z=Z_canopia,
             surfacecolor=val_color,
             colorscale=c_scale,
-            showscale=True, colorbar=dict(title=c_title, len=0.6, x=1.02),
+            showscale=True,
+            colorbar=dict(
+                title=dict(text=c_title, side="top"),
+                len=0.55, y=0.5, x=1.05, thickness=16,
+                outlinewidth=1
+            ),
             opacity=0.88,
             lighting=dict(ambient=0.8, diffuse=0.85, roughness=0.7),
             name="Superficie Agronómica", hoverinfo="none"
@@ -443,7 +453,18 @@ def interfaz_gemelo():
             aspectratio=dict(x=1.3, y=1.0, z=0.35)
         ),
         title=f"🌽 Gemelo Digital 3D de Maíz — {escenario_sel.split(':')[0]} ({etapa_maiz.split('—')[0].strip()})",
-        height=620, margin=dict(l=0, r=0, b=0, t=40)
+        height=620,
+        legend=dict(
+            orientation="h",
+            x=0.5, xanchor="center",
+            y=-0.08, yanchor="top",
+            bgcolor="rgba(15, 23, 42, 0.92)",
+            bordercolor="rgba(255, 255, 255, 0.18)",
+            borderwidth=1,
+            font=dict(size=11, color="#f1f5f9"),
+            itemgap=18
+        ),
+        margin=dict(l=25, r=95, b=85, t=40)
     )
     st.plotly_chart(fig3d, use_container_width=True)
 

@@ -662,16 +662,50 @@ h1, h2, h3, h4 {
 .seg-4 { flex: 3; background: #10b981; }
 .seg-5 { flex: 2; background: #f59e0b; }
 
+/* Spacing and Layout Utilities */
+.tab-pane-content {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.space-y-6 > * + * {
+  margin-top: 1.5rem;
+}
+
+.space-y-4 > * + * {
+  margin-top: 1rem;
+}
+
+.grid-4-cols {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1.25rem;
+}
+
+@media (max-width: 1100px) {
+  .grid-4-cols {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 640px) {
+  .grid-4-cols {
+    grid-template-columns: 1fr;
+  }
+}
+
 /* Metrics Cards */
 .metric-card {
   display: flex;
   flex-direction: column;
-  gap: 0.25rem;
+  gap: 0.45rem;
+  padding: 1.25rem 1.4rem;
 }
 
-.metric-label { font-size: 0.72rem; text-transform: uppercase; color: #94a3b8; font-weight: 600; }
-.metric-value { font-size: 1.5rem; font-weight: 800; color: #f8fafc; }
-.metric-sublabel { font-size: 0.7rem; color: #64748b; }
+.metric-label { font-size: 0.75rem; text-transform: uppercase; color: #94a3b8; font-weight: 600; letter-spacing: 0.03em; }
+.metric-value { font-size: 1.6rem; font-weight: 800; color: #f8fafc; }
+.metric-sublabel { font-size: 0.72rem; color: #64748b; }
 
 /* Tables */
 .table-responsive {
@@ -1302,9 +1336,9 @@ h1, h2, h3, h4 {
 .viewport-topbar {
   height: 58px;
   border-bottom: 1px solid var(--border-color);
-  background: rgba(15, 23, 42, 0.75);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
+  background: rgba(15, 23, 42, 0.95);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
   display: flex;
   justify-content: space-between;
   align-items: center;
