@@ -86,11 +86,11 @@ class ModeloHibridoAPSIM_XGBoost:
         return np.clip((base_pred * self.peso_biofisico) + res_pred, 1.0, 16.5)
 
 # ══════════════════════════════════════════════════════════════════
-# 1. ARQUITECTURA DE HOMOLOGACIÓN Y EDA — DATASET MAESTRO MAÍZ
+# 1. METODOLOGÍA CRISP-DM Y HOMOLOGACIÓN DE DATOS
 # ══════════════════════════════════════════════════════════════════
 
-def render_tab_1_eda(df):
-    st.subheader("1. Metodología CRISP-DM, Homologación y EDA — Dataset Maestro Maíz")
+def render_tab_1_metodologia_crisp_dm(df):
+    st.subheader("1. Metodología CRISP-DM y Homologación de Datos")
     st.markdown("""
     > **Marco Metodológico CRISP-DM Adaptado a Agricultura de Precisión:**  
     > La investigación estructura todo el ciclo de minería de datos y modelado biofísico bajo el estándar **CRISP-DM** (*Cross-Industry Standard Process for Data Mining*):
@@ -457,7 +457,16 @@ graph TD
         explicabilidad="Interoperabilidad semántica y neutralización del sesgo de origen: Al resolver discrepancias de escala, unidades y sistemas de coordenadas geográficas (OGC / AgGateway ADAPT), se genera un sustrato de datos uniforme de 650 parcelas. Esto evita artefactos espaciales espurios y permite que los modelos de machine learning aprendan patrones agronómicos generalizables transferibles a escala global."
     )
 
-    st.markdown("---")
+# ══════════════════════════════════════════════════════════════════
+# 2. ANÁLISIS EXPLORATORIO DE DATOS MULTI-FUENTE (EDA)
+# ══════════════════════════════════════════════════════════════════
+
+def render_tab_2_eda(df):
+    st.subheader("2. Análisis Exploratorio de Datos Multi-Fuente (EDA) — Dataset Maestro Maíz")
+    st.markdown("""
+    > **Exploración Integral sobre el Dataset Maestro Maíz ($N = 650$ Parcelas):**  
+    > Análisis multi-modal global que integra las firmas espectrales de alta resolución (UAV 5cm), satelitales (Sentinel-2 10m), propiedades edáficas de SoilGrids 2.0 y el manejo agronómico de campo sin segmentaciones aisladas.
+    """)
 
     # ─── EDA DEL DATASET MAESTRO MAÍZ (POBLACIÓN TOTAL CONSOLIDADA) ───
     st.markdown("#### 🌽 Dataset Maestro Maíz Consolidado (N = 650 Parcelas)")
@@ -628,11 +637,11 @@ def asegurar_modelos_entrenados(df, forzar=False):
     return st.session_state.resultados_entrenamiento
 
 # ══════════════════════════════════════════════════════════════════
-# 2. ENTRENAMIENTO DE MODELOS (DATOS LISTOS)
+# 3. ENTRENAMIENTO DE MODELOS (DATOS LISTOS)
 # ══════════════════════════════════════════════════════════════════
 
-def render_tab_2_entrenamiento(df):
-    st.subheader("2. Resultados de Modelos Predictivos (Datos Listos)")
+def render_tab_3_entrenamiento(df):
+    st.subheader("3. Modelos Predictivos sobre el Dataset Maestro Maíz")
     st.markdown("""
     > **Modelos Evaluados sobre los Datasets Reales:**
     > 1. **Random Forest Regressor:** Ensamble no-lineal por Bagging de árboles de decisión.
@@ -654,11 +663,11 @@ def render_tab_2_entrenamiento(df):
     )
 
 # ══════════════════════════════════════════════════════════════════
-# 3. SELECCIÓN DEL MEJOR MODELO
+# 4. SELECCIÓN DEL MEJOR MODELO
 # ══════════════════════════════════════════════════════════════════
 
-def render_tab_3_seleccion_mejor(df):
-    st.subheader("3. Selección del Mejor Modelo")
+def render_tab_4_seleccion_mejor(df):
+    st.subheader("4. Selección del Mejor Modelo Predictivo")
 
     res = asegurar_modelos_entrenados(df)
     df_m = res["df_metricas"]
@@ -741,11 +750,11 @@ def render_tab_3_seleccion_mejor(df):
             st.caption(f"Detalle SHAP: {e}")
 
 # ══════════════════════════════════════════════════════════════════
-# 4. VALIDACIÓN CRUZADA ESPACIAL ENTRE DATASETS REALES
+# 5. VALIDACIÓN CRUZADA ESPACIAL ENTRE DATASETS REALES
 # ══════════════════════════════════════════════════════════════════
 
-def render_tab_4_val_cruzada(df):
-    st.subheader("4. Validación Cruzada Espacio-Temporal entre Datasets Reales")
+def render_tab_5_val_cruzada(df):
+    st.subheader("5. Validación Cruzada Espacio-Temporal entre Datasets Reales")
     st.markdown("""
     > **Autocorrelación Espacial y Generalización Multi-Sitio:**
     > Para evaluar la capacidad real de transferibilidad del gemelo digital a nuevos campos sin incurrir en fuga de datos (data leakage),
@@ -816,11 +825,11 @@ def render_tab_4_val_cruzada(df):
     )
 
 # ══════════════════════════════════════════════════════════════════
-# 5. HIPERPARÁMETROS ÓPTIMOS CALIBRADOS (DATOS LISTOS)
+# 6. HIPERPARÁMETROS ÓPTIMOS CALIBRADOS (DATOS LISTOS)
 # ══════════════════════════════════════════════════════════════════
 
-def render_tab_5_hiperparametros(df):
-    st.subheader("5. Hiperparámetros Óptimos Calibrados por Modelo")
+def render_tab_6_hiperparametros(df):
+    st.subheader("6. Hiperparámetros Óptimos Calibrados por Modelo")
     st.markdown("""
     > Configuración y calibración óptima del espacio de hiperparámetros para **cada uno de los 4 modelos evaluados**,
     > ajustada mediante validación cruzada espacial sobre la red de datasets reales.
@@ -877,11 +886,11 @@ def render_tab_5_hiperparametros(df):
     )
 
 # ══════════════════════════════════════════════════════════════════
-# 6. PRUEBAS ROBUSTAS Y BENCHMARKING DE ARQUITECTURAS
+# 7. PRUEBAS ROBUSTAS Y BENCHMARKING DE ARQUITECTURAS
 # ══════════════════════════════════════════════════════════════════
 
-def render_tab_6_pruebas_robustas(df):
-    st.subheader("6. Pruebas Robustas y Comparación de Arquitecturas")
+def render_tab_7_pruebas_robustas(df):
+    st.subheader("7. Pruebas Robustas y Comparación de Arquitecturas")
     st.markdown("""
     > Evaluación estadística rigurosa y comparativa cuantitativa:
     > 1. **Benchmarking de Arquitecturas de Integración** (Tiempos y Precisión)
@@ -1211,25 +1220,28 @@ def interfaz_motor_ia():
     df = obtener_o_inicializar_dataframe()
     asegurar_modelos_entrenados(df)
 
-    # 6 PESTAÑAS SECUENCIALES LIMPIAS CON RESULTADOS LISTOS
-    tab1, tab2, tab3, tab4, tab5, tab6 = st.tabs([
-        "📊 1. Metodología CRISP-DM & EDA",
-        "🏋️ 2. Entrenamiento",
-        "🏆 3. Selección del Mejor Modelo",
-        "🗺️ 4. Validación Cruzada",
-        "⚙️ 5. Hiperparámetros",
-        "🧪 6. Pruebas Robustas"
+    # 7 PESTAÑAS SECUENCIALES LIMPIAS CON RESULTADOS LISTOS
+    tab1, tab2, tab3, tab4, tab5, tab6, tab7 = st.tabs([
+        "📐 1. Metodología CRISP-DM",
+        "📊 2. EDA",
+        "🏋️ 3. Entrenamiento",
+        "🏆 4. Selección del Mejor Modelo",
+        "🗺️ 5. Validación Cruzada",
+        "⚙️ 6. Hiperparámetros",
+        "🧪 7. Pruebas Robustas"
     ])
 
     with tab1:
-        render_tab_1_eda(df)
+        render_tab_1_metodologia_crisp_dm(df)
     with tab2:
-        render_tab_2_entrenamiento(df)
+        render_tab_2_eda(df)
     with tab3:
-        render_tab_3_seleccion_mejor(df)
+        render_tab_3_entrenamiento(df)
     with tab4:
-        render_tab_4_val_cruzada(df)
+        render_tab_4_seleccion_mejor(df)
     with tab5:
-        render_tab_5_hiperparametros(df)
+        render_tab_5_val_cruzada(df)
     with tab6:
-        render_tab_6_pruebas_robustas(df)
+        render_tab_6_hiperparametros(df)
+    with tab7:
+        render_tab_7_pruebas_robustas(df)
