@@ -90,15 +90,175 @@ class ModeloHibridoAPSIM_XGBoost:
 # ══════════════════════════════════════════════════════════════════
 
 def render_tab_1_eda(df):
-    st.subheader("1. Arquitectura de Homologación y EDA — Dataset Maestro Maíz")
+    st.subheader("1. Metodología CRISP-DM, Homologación y EDA — Dataset Maestro Maíz")
     st.markdown("""
-    > **Flujo Metodológico Integral de la Investigación:**  
-    > La red experimental consolida los **5 datasets reales** (*CIMMYT Chiapas, CIMMYT Bajío, USDA Colorado, USDA Bushland, CIMMYT México Central*)
-    > a través de un proceso de **HOMOLOGACIÓN DE VARIABLES** (unidades comunes, variables comunes y categorías comunes).
-    > Esto conforma el **DATASET MAESTRO MAÍZ**, que alimenta simultáneamente el EDA, el entrenamiento de modelos predictivos,
-    > la validación espacial, el acoplamiento al **Gemelo Digital**, el orquestador **LangGraph** y la optimización multi-objetivo (**NSGA-II / NSGA-III**)
-    > para generar la **Frontera de Pareto**.
+    > **Marco Metodológico CRISP-DM Adaptado a Agricultura de Precisión:**  
+    > La investigación estructura todo el ciclo de minería de datos y modelado biofísico bajo el estándar **CRISP-DM** (*Cross-Industry Standard Process for Data Mining*):
+    > 1. **Comprensión del Negocio / Agronómica:** Maximizar el rendimiento de maíz y optimizar el uso de agua y nitrógeno, formulando las funciones objetivo del Gemelo Digital.
+    > 2. **Comprensión de los Datos:** Adquisición multi-sensor (Sentinel-2 10m, UAV 5cm, SoilGrids 2.0 y Ground Truth de cosecha) en 5 estaciones reales (*CIMMYT Chiapas, CIMMYT Bajío, USDA Colorado, USDA Bushland, CIMMYT México Central*).
+    > 3. **Preparación de Datos:** Homologación semántica de unidades, variables y categorías hacia el **DATASET MAESTRO MAÍZ** ($N = 650$ parcelas).
+    > 4. **Modelado:** Entrenamiento de ensambles no lineales y residuales (Random Forest, XGBoost, APSIM y Modelo Híbrido físico-mecanicista).
+    > 5. **Evaluación:** Validación cruzada espacial *Leave-One-Site-Out* y pruebas estadísticas robustas (Friedman, Wilcoxon + Holm, ANOVA, KS, Sobol).
+    > 6. **Despliegue:** Integración en el Gemelo Digital interactivo, orquestación mediante agentes **LangGraph** y exploración multi-objetivo con **NSGA-II / NSGA-III** para la Frontera de Pareto.
     """)
+
+    # ─── TABLA DE FACTORES: CLASIFICACIÓN DE VARIABLES ───
+    st.markdown("#### 🔬 Tabla de Factores: Clasificación de Variables (CRISP-DM)")
+    st.caption("Estructuración metodológica: Covariables independientes no controlables, variables de tratamiento agronómico y variables dependientes de respuesta.")
+
+    df_factores = pd.DataFrame([
+        {
+            "Tipo de Factor": "🌱 Variable Independiente (Covariable)",
+            "Variable (Código)": "soil_arcilla_pct",
+            "Rol en CRISP-DM & Gemelo": "Textura edáfica y retención de humedad",
+            "Fuente / Sensor": "ISRIC SoilGrids 2.0 (0–30 cm)",
+            "Unidad": "%",
+            "Rango de Operación": "8.0 – 52.0%",
+            "Controlabilidad Agronómica": "Fijo / Edafoclima no controlable"
+        },
+        {
+            "Tipo de Factor": "🌱 Variable Independiente (Covariable)",
+            "Variable (Código)": "soil_materia_organica",
+            "Rol en CRISP-DM & Gemelo": "Fertilidad intrínseca y capacidad de intercambio catiónico",
+            "Fuente / Sensor": "SoilGrids 2.0 / Química de Suelo",
+            "Unidad": "%",
+            "Rango de Operación": "0.8 – 6.0%",
+            "Controlabilidad Agronómica": "No controlable a corto plazo"
+        },
+        {
+            "Tipo de Factor": "🌱 Variable Independiente (Covariable)",
+            "Variable (Código)": "soil_ph",
+            "Rol en CRISP-DM & Gemelo": "Disponibilidad iónica de nutrientes en solución",
+            "Fuente / Sensor": "SoilGrids 2.0 (1:1 H2O)",
+            "Unidad": "Escala pH",
+            "Rango de Operación": "5.2 – 8.2",
+            "Controlabilidad Agronómica": "Modificable solo a largo plazo (enmiendas)"
+        },
+        {
+            "Tipo de Factor": "🌱 Variable Independiente (Covariable)",
+            "Variable (Código)": "s2_ndvi",
+            "Rol en CRISP-DM & Gemelo": "Vigor fotosintético del dosel a escala regional",
+            "Fuente / Sensor": "Copernicus Sentinel-2 BOA (10m)",
+            "Unidad": "Adimensional [-1, 1]",
+            "Rango de Operación": "0.25 – 0.92",
+            "Controlabilidad Agronómica": "Observable remoto (refleja estado vegetativo)"
+        },
+        {
+            "Tipo de Factor": "🌱 Variable Independiente (Covariable)",
+            "Variable (Código)": "s2_ndre",
+            "Rol en CRISP-DM & Gemelo": "Contenido de clorofila y sanidad en dosel cerrado",
+            "Fuente / Sensor": "Sentinel-2 Banda Red-Edge (10m)",
+            "Unidad": "Adimensional",
+            "Rango de Operación": "0.18 – 0.76",
+            "Controlabilidad Agronómica": "Observable remoto (diagnóstico temprano)"
+        },
+        {
+            "Tipo de Factor": "🌱 Variable Independiente (Covariable)",
+            "Variable (Código)": "uav_ndvi",
+            "Rol en CRISP-DM & Gemelo": "Micro-heterogeneidad del dosel y vigor a escala fina",
+            "Fuente / Sensor": "OpenDroneMap UAV multiespectral (5cm)",
+            "Unidad": "Adimensional [0, 1]",
+            "Rango de Operación": "0.28 – 0.96",
+            "Controlabilidad Agronómica": "Observable ultra-alta resolución"
+        },
+        {
+            "Tipo de Factor": "🌱 Variable Independiente (Covariable)",
+            "Variable (Código)": "uav_canopia_pct",
+            "Rol en CRISP-DM & Gemelo": "Cobertura vegetal efectiva y arquitectura del cultivo",
+            "Fuente / Sensor": "Segmentación fotogramétrica UAV",
+            "Unidad": "%",
+            "Rango de Operación": "35.0 – 99.5%",
+            "Controlabilidad Agronómica": "Observable de desarrollo foliar"
+        },
+        {
+            "Tipo de Factor": "🌱 Variable Independiente (Covariable)",
+            "Variable (Código)": "apsim_rendimiento_sim",
+            "Rol en CRISP-DM & Gemelo": "Simulación mecanicista biofísica de balance suelo-planta",
+            "Fuente / Sensor": "Simulador Biofísico APSIM 7.10",
+            "Unidad": "ton/ha",
+            "Rango de Operación": "3.5 – 15.5 ton/ha",
+            "Controlabilidad Agronómica": "Modelo mecanicista de procesos biofísicos"
+        },
+        {
+            "Tipo de Factor": "🚜 Variable de Tratamiento (Manejo)",
+            "Variable (Código)": "dosis_nitrogeno_kgha",
+            "Rol en CRISP-DM & Gemelo": "Dosis de fertilización nitrogenada mineral aplicada",
+            "Fuente / Sensor": "OpenFarm / Prescripción VRA",
+            "Unidad": "kg N/ha",
+            "Rango de Operación": "80 – 260 kg/ha",
+            "Controlabilidad Agronómica": "100% Controlable (Variable de decisión Pareto)"
+        },
+        {
+            "Tipo de Factor": "🚜 Variable de Tratamiento (Manejo)",
+            "Variable (Código)": "dosis_fosforo_kgha",
+            "Rol en CRISP-DM & Gemelo": "Dosis de fertilización fosfatada para desarrollo radical",
+            "Fuente / Sensor": "OpenFarm / Plan de Abonado",
+            "Unidad": "kg P/ha",
+            "Rango de Operación": "25 – 105 kg/ha",
+            "Controlabilidad Agronómica": "100% Controlable (Manejo agronómico)"
+        },
+        {
+            "Tipo de Factor": "🚜 Variable de Tratamiento (Manejo)",
+            "Variable (Código)": "dosis_potasio_kgha",
+            "Rol en CRISP-DM & Gemelo": "Dosis de potasio para osmorregulación y resistencia",
+            "Fuente / Sensor": "OpenFarm / Plan de Abonado",
+            "Unidad": "kg K/ha",
+            "Rango de Operación": "50 – 175 kg/ha",
+            "Controlabilidad Agronómica": "100% Controlable (Manejo agronómico)"
+        },
+        {
+            "Tipo de Factor": "🚜 Variable de Tratamiento (Manejo)",
+            "Variable (Código)": "densidad_plantas_m2",
+            "Rol en CRISP-DM & Gemelo": "Población vegetal de siembra de precisión",
+            "Fuente / Sensor": "Sembradora neumática calibrada",
+            "Unidad": "plantas/m²",
+            "Rango de Operación": "5.5 – 9.8 pl/m²",
+            "Controlabilidad Agronómica": "100% Controlable (Variable de decisión Pareto)"
+        },
+        {
+            "Tipo de Factor": "🚜 Variable de Tratamiento (Manejo)",
+            "Variable (Código)": "dia_juliano",
+            "Rol en CRISP-DM & Gemelo": "Calendario y ventana de siembra programada",
+            "Fuente / Sensor": "Bitácora Agronómica de Campo",
+            "Unidad": "Día del año (DOY)",
+            "Rango de Operación": "110 – 138 (Mayo–Junio)",
+            "Controlabilidad Agronómica": "Controlable según pronóstico agrometeorológico"
+        },
+        {
+            "Tipo de Factor": "🌾 Variable Dependiente (Respuesta)",
+            "Variable (Código)": "rendimiento_real_ton_ha",
+            "Rol en CRISP-DM & Gemelo": "Rendimiento final de cosecha de grano cosechado (Ground Truth)",
+            "Fuente / Sensor": "Monitor Cosecha Calibrado (14% H)",
+            "Unidad": "ton/ha",
+            "Rango de Operación": "3.2 – 16.0 ton/ha",
+            "Controlabilidad Agronómica": "Función Objetivo Principal (Maximización en Gemelo)"
+        },
+        {
+            "Tipo de Factor": "🌾 Variable Dependiente (Respuesta)",
+            "Variable (Código)": "eficiencia_uso_n_nue",
+            "Rol en CRISP-DM & Gemelo": "Eficiencia agronómica de uso del nitrógeno (kg grano / kg N)",
+            "Fuente / Sensor": "Métrica derivada de optimización",
+            "Unidad": "kg grano / kg N",
+            "Rango de Operación": "35 – 70 kg/kg",
+            "Controlabilidad Agronómica": "Función Objetivo Ambiental (Maximización en NSGA-III)"
+        },
+        {
+            "Tipo de Factor": "🌾 Variable Dependiente (Respuesta)",
+            "Variable (Código)": "margen_bruto_usd_ha",
+            "Rol en CRISP-DM & Gemelo": "Rentabilidad económica neta (Ingresos - Costo insumos)",
+            "Fuente / Sensor": "Función económica del Gemelo",
+            "Unidad": "USD/ha",
+            "Rango de Operación": "650 – 2,800 USD/ha",
+            "Controlabilidad Agronómica": "Función Objetivo Financiera (Maximización en Pareto)"
+        }
+    ])
+    st.dataframe(df_factores, use_container_width=True)
+    mostrar_interpretabilidad_explicabilidad(
+        interpretabilidad="Tabla de factores estructurada según el marco CRISP-DM que clasifica exhaustivamente las 16 variables del ecosistema del gemelo digital en tres categorías operativas: (1) Variables Independientes (covariables edáficas, espectrales y biofísicas fijas u observables), (2) Variables de Tratamiento (palancas de decisión antropogénica 100% controlables como fertilización y densidad) y (3) Variables Dependientes (rendimiento ground truth, eficiencia de nitrógeno y margen económico neto).",
+        explicabilidad="Fundamento metodológico para la optimización y control del gemelo digital: En agricultura de precisión, el modelo de machine learning no solo debe predecir pasivamente, sino actuar como motor de inferencia causal. Discriminar entre covariables del entorno (inamovibles durante la campaña) y variables de tratamiento agronómico permite formular el problema de optimización multiobjetivo con algoritmos genéticos (NSGA-II / NSGA-III), variando únicamente las variables de tratamiento para proyectar la Frontera de Pareto óptima sin violar las restricciones biofísicas del suelo y clima."
+    )
+
+    st.markdown("---")
 
     # Control condicional mediante botón para desplegar el diagrama de flujo y grafo metodológico
     if "mostrar_diagrama_flujo" not in st.session_state:
@@ -1053,7 +1213,7 @@ def interfaz_motor_ia():
 
     # 6 PESTAÑAS SECUENCIALES LIMPIAS CON RESULTADOS LISTOS
     tab1, tab2, tab3, tab4, tab5, tab6 = st.tabs([
-        "📊 1. EDA",
+        "📊 1. Metodología CRISP-DM & EDA",
         "🏋️ 2. Entrenamiento",
         "🏆 3. Selección del Mejor Modelo",
         "🗺️ 4. Validación Cruzada",
