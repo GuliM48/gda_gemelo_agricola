@@ -100,11 +100,22 @@ def render_tab_1_eda(df):
     > para generar la **Frontera de Pareto**.
     """)
 
-    # Diagrama de flujo exacto de la arquitectura
-    c_diag1, c_diag2 = st.columns([1, 1])
-    with c_diag1:
-        st.markdown("##### 📐 Diagrama de Flujo del Pipeline")
-        st.code("""
+    # Control condicional mediante botón para desplegar el diagrama de flujo y grafo metodológico
+    if "mostrar_diagrama_flujo" not in st.session_state:
+        st.session_state.mostrar_diagrama_flujo = False
+
+    c_b_d, _ = st.columns([2, 2])
+    with c_b_d:
+        label_btn = "🔼 Ocultar Diagrama de Flujo y Grafo" if st.session_state.mostrar_diagrama_flujo else "🗺️ Ver Diagrama de Flujo del Pipeline y Grafo Metodológico"
+        if st.button(label_btn, key="btn_toggle_flujo_maestro"):
+            st.session_state.mostrar_diagrama_flujo = not st.session_state.mostrar_diagrama_flujo
+            st.rerun()
+
+    if st.session_state.mostrar_diagrama_flujo:
+        c_diag1, c_diag2 = st.columns([1, 1])
+        with c_diag1:
+            st.markdown("##### 📐 Diagrama de Flujo del Pipeline")
+            st.code("""
                   ┌── CIMMYT Chiapas
                   │
                   ├── CIMMYT Bajío
@@ -146,9 +157,9 @@ Datasets reales ──┼── USDA Colorado
                      Frontera Pareto
 """, language="text")
 
-    with c_diag2:
-        st.markdown("##### 🗺️ Grafo Metodológico Interactivo")
-        st.markdown("""
+        with c_diag2:
+            st.markdown("##### 🗺️ Grafo Metodológico Interactivo")
+            st.markdown("""
 ```mermaid
 graph TD
     subgraph D1 ["Datasets Reales Multi-Entorno"]
@@ -209,9 +220,8 @@ graph TD
     style HV fill:#1565C0,stroke:#0D47A1,stroke-width:2px,color:#fff
     style FP fill:#E65100,stroke:#BF360C,stroke-width:2px,color:#fff
 ```
-        """)
-
-    st.markdown("---")
+            """)
+        st.markdown("---")
 
     # ─── TABLA DE HOMOLOGACIÓN DE VARIABLES ───
     st.markdown("#### 📋 Matriz de Homologación de Variables hacia el Dataset Maestro Maíz")
