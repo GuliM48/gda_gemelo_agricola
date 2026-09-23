@@ -86,73 +86,249 @@ class ModeloHibridoAPSIM_XGBoost:
         return np.clip((base_pred * self.peso_biofisico) + res_pred, 1.0, 16.5)
 
 # ══════════════════════════════════════════════════════════════════
-# 1. EDA (ANÁLISIS EXPLORATORIO DE DATOS MULTI-FUENTE REALES)
+# 1. ARQUITECTURA DE HOMOLOGACIÓN Y EDA — DATASET MAESTRO MAÍZ
 # ══════════════════════════════════════════════════════════════════
 
 def render_tab_1_eda(df):
-    st.subheader("1. Análisis Exploratorio de Datos Multi-Fuente (EDA)")
+    st.subheader("1. Arquitectura de Homologación y EDA — Dataset Maestro Maíz")
     st.markdown("""
-    > **Red de Datasets Experimentales Reales:**
-    > - 🌾 **CIMMYT Chiapas:** Ladera y valle tropical subhúmedo (Villaflores/Frailesca). Suelos francos con alta materia orgánica.
-    > - 🚜 **CIMMYT Bajío:** Vertisoles arcillosos de alta fertilidad, riego tecnificado y alta dosis de N (Celaya, Guanajuato).
-    > - 🏔️ **USDA Colorado:** Greeley, CO (USDA-ARS Limited Irrigation Unit). Clima semiárido frío y riego por goteo/pivote.
-    > - 🌪️ **USDA Bushland:** Texas Panhandle (USDA-ARS CPRL). Suelos Pullman clay loam, estrés térmico estival y lisímetros de pesaje.
-    > - 🏛️ **CIMMYT México Central:** Sede Global El Batán / Texcoco. Valles Altos templados (2,250 msnm) y suelos volcánicos.
+    > **Flujo Metodológico Integral de la Investigación:**  
+    > La red experimental consolida los **5 datasets reales** (*CIMMYT Chiapas, CIMMYT Bajío, USDA Colorado, USDA Bushland, CIMMYT México Central*)
+    > a través de un proceso de **HOMOLOGACIÓN DE VARIABLES** (unidades comunes, variables comunes y categorías comunes).
+    > Esto conforma el **DATASET MAESTRO MAÍZ**, que alimenta simultáneamente el EDA, el entrenamiento de modelos predictivos,
+    > la validación espacial, el acoplamiento al **Gemelo Digital**, el orquestador **LangGraph** y la optimización multi-objetivo (**NSGA-II / NSGA-III**)
+    > para generar la **Frontera de Pareto**.
     """)
 
-    # Selector interactivo de dataset real para inspección analítica
-    opciones_sitios = ["🌐 Todos los Datasets (Red CIMMYT + USDA)"] + SITIOS_REALES
-    sitio_sel = st.selectbox(
-        "📍 Seleccionar Dataset Experimental Real para Exploración Detallada:",
-        opciones_sitios,
-        index=0,
-        key="sel_dataset_real_eda"
+    # Diagrama de flujo exacto de la arquitectura
+    c_diag1, c_diag2 = st.columns([1, 1])
+    with c_diag1:
+        st.markdown("##### 📐 Diagrama de Flujo del Pipeline")
+        st.code("""
+                  ┌── CIMMYT Chiapas
+                  │
+                  ├── CIMMYT Bajío
+Datasets reales ──┼── USDA Colorado
+                  │
+                  ├── USDA Bushland
+                  │
+                  └── CIMMYT México Central
+                           │
+                           ▼
+                  HOMOLOGACIÓN DE VARIABLES
+                           │
+             ┌─────────────┼─────────────┐
+             ▼             ▼             ▼
+          Unidades      Variables     Categorías
+          comunes       comunes        comunes
+             │             │             │
+             └─────────────┼─────────────┘
+                           ▼
+                 DATASET MAESTRO MAÍZ
+                           │
+             ┌─────────────┼─────────────┐
+             ▼             ▼             ▼
+            EDA       Entrenamiento    Validación
+                           │
+                           ▼
+                    Modelos predictivos
+                           │
+                           ▼
+                    Gemelo Digital
+                           │
+                           ▼
+                 LangGraph + escenarios
+                           │
+                           ▼
+                  NSGA-II / NSGA-III
+                           │
+                           ▼
+                     Frontera Pareto
+""", language="text")
+
+    with c_diag2:
+        st.markdown("##### 🗺️ Grafo Metodológico Interactivo")
+        st.markdown("""
+```mermaid
+graph TD
+    subgraph D1 ["Datasets Reales Multi-Entorno"]
+        C1["🌾 CIMMYT Chiapas"]
+        C2["🚜 CIMMYT Bajío"]
+        C3["🏔️ USDA Colorado"]
+        C4["🌪️ USDA Bushland"]
+        C5["🏛️ CIMMYT México Central"]
+    end
+
+    HV["⚙️ HOMOLOGACIÓN DE VARIABLES"]
+    C1 --> HV
+    C2 --> HV
+    C3 --> HV
+    C4 --> HV
+    C5 --> HV
+
+    subgraph D2 ["Ejes de Homologación"]
+        U["📏 Unidades Comunes"]
+        V["🔬 Variables Comunes"]
+        K["🏷️ Categorías Comunes"]
+    end
+
+    HV --> U
+    HV --> V
+    HV --> K
+
+    DM["🌽 DATASET MAESTRO MAÍZ<br/>(N = 650 Parcelas Armonizadas)"]
+    U --> DM
+    V --> DM
+    K --> DM
+
+    EDA["📊 EDA Multi-Modal"]
+    TRAIN["🏋️ Entrenamiento"]
+    VAL["🗺️ Validación LOSO"]
+
+    DM --> EDA
+    DM --> TRAIN
+    DM --> VAL
+
+    MP["🤖 Modelos Predictivos"]
+    TRAIN --> MP
+    VAL --> MP
+
+    GD["🌍 Gemelo Digital Agrícola"]
+    MP --> GD
+
+    LG["🧠 LangGraph + Escenarios"]
+    GD --> LG
+
+    NSGA["⚡ NSGA-II / NSGA-III"]
+    LG --> NSGA
+
+    FP["🎯 Frontera Pareto Multi-Objetivo"]
+    NSGA --> FP
+
+    style DM fill:#2E7D32,stroke:#1B5E20,stroke-width:2px,color:#fff
+    style HV fill:#1565C0,stroke:#0D47A1,stroke-width:2px,color:#fff
+    style FP fill:#E65100,stroke:#BF360C,stroke-width:2px,color:#fff
+```
+        """)
+
+    st.markdown("---")
+
+    # ─── TABLA DE HOMOLOGACIÓN DE VARIABLES ───
+    st.markdown("#### 📋 Matriz de Homologación de Variables hacia el Dataset Maestro Maíz")
+    df_homologacion = pd.DataFrame([
+        {
+            "Eje de Homologación": "📏 Unidades Comunes",
+            "Variable Original": "Grain_Yield (bu/ac) / Cosecha (kg/ha)",
+            "Fuente de Origen": "USDA Monitor Cosecha / CIMMYT Ensayos",
+            "Variable Homologada": "rendimiento_real_ton_ha",
+            "Unidad Común ISO/OGC": "ton/ha",
+            "Regla Semántica de Homologación": "Conversión masa/área con ajuste estandarizado al 14% de humedad de grano"
+        },
+        {
+            "Eje de Homologación": "📏 Unidades Comunes",
+            "Variable Original": "N_Applied (lbs/ac) / Dosis_N (kg/ha)",
+            "Fuente de Origen": "OpenFarm / AgGateway ADAPT",
+            "Variable Homologada": "dosis_nitrogeno_kgha",
+            "Unidad Común ISO/OGC": "kg N/ha",
+            "Regla Semántica de Homologación": "Conversión imperial-métrico de nitrógeno elemental total aplicado"
+        },
+        {
+            "Eje de Homologación": "📏 Unidades Comunes",
+            "Variable Original": "Plant_Density (seeds/ac) / Poblacion (pl/ha)",
+            "Fuente de Origen": "Registros de Siembra Prescrita",
+            "Variable Homologada": "densidad_plantas_m2",
+            "Unidad Común ISO/OGC": "plantas/m²",
+            "Regla Semántica de Homologación": "Normalización por superficie neta de cultivo a densidad por m²"
+        },
+        {
+            "Eje de Homologación": "🔬 Variables Comunes",
+            "Variable Original": "B4 (Red 665nm) & B8 (NIR 842nm)",
+            "Fuente de Origen": "Copernicus Sentinel-2 (L2A BOA)",
+            "Variable Homologada": "s2_ndvi, s2_ndre",
+            "Unidad Común ISO/OGC": "Adimensional [-1, 1]",
+            "Regla Semántica de Homologación": "Cálculo normalizado de reflectancia a nivel dosel (10m de resolución espacial)"
+        },
+        {
+            "Eje de Homologación": "🔬 Variables Comunes",
+            "Variable Original": "Ortomosaico Multiespectral (5cm)",
+            "Fuente de Origen": "OpenDroneMap UAV / Dron Agrícola",
+            "Variable Homologada": "uav_ndvi, uav_canopia_pct",
+            "Unidad Común ISO/OGC": "Adimensional / %",
+            "Regla Semántica de Homologación": "Agregación espacial bilineal de 5cm a píxel canónico armonizado de 10m"
+        },
+        {
+            "Eje de Homologación": "🔬 Variables Comunes",
+            "Variable Original": "Clay (g/kg), SOC (g/kg), pH×10",
+            "Fuente de Origen": "ISRIC SoilGrids 2.0 (250m)",
+            "Variable Homologada": "soil_arcilla_pct, soil_mo, soil_ph",
+            "Unidad Común ISO/OGC": "%, %, Escala pH",
+            "Regla Semántica de Homologación": "Downscaling espacial con covariables edáficas a horizonte 0–30 cm de profundidad"
+        },
+        {
+            "Eje de Homologación": "🏷️ Categorías Comunes",
+            "Variable Original": "Biomass_sim, Yield_sim (APSIM 7.10)",
+            "Fuente de Origen": "Simulador Biofísico Mecanicista",
+            "Variable Homologada": "apsim_rendimiento_sim",
+            "Unidad Común ISO/OGC": "ton/ha",
+            "Regla Semántica de Homologación": "Balance hídrico diario y acumulación de biomasa acoplada a fenología estándar"
+        },
+        {
+            "Eje de Homologación": "🏷️ Categorías Comunes",
+            "Variable Original": "Location / Bloque / Estación Experimental",
+            "Fuente de Origen": "Red CIMMYT (México) & USDA (EE.UU.)",
+            "Variable Homologada": "dataset_real / bloque_espacial",
+            "Unidad Común ISO/OGC": "Categoría Nominal (5 Sitios)",
+            "Regla Semántica de Homologación": "Estandarización de 5 agroecosistemas: Chiapas, Bajío, Colorado, Bushland y México Central"
+        }
+    ])
+    st.dataframe(df_homologacion, use_container_width=True)
+    mostrar_interpretabilidad_explicabilidad(
+        interpretabilidad="Matriz formal de homologación multi-sitio que consolida los 5 datasets heterogéneos en el Dataset Maestro Maíz. Estandariza unidades métricas internacionales (ton/ha, kg N/ha, plantas/m²), armoniza las resoluciones radiométricas y espaciales entre sensores (UAV a 5 cm agregados a teselas de 10 m de Sentinel-2) y unifica las categorías taxonómicas de suelo y fenología de cultivo.",
+        explicabilidad="Interoperabilidad semántica y neutralización del sesgo de origen: Al resolver discrepancias de escala, unidades y sistemas de coordenadas geográficas (OGC / AgGateway ADAPT), se genera un sustrato de datos uniforme de 650 parcelas. Esto evita artefactos espaciales espurios y permite que los modelos de machine learning aprendan patrones agronómicos generalizables transferibles a escala global."
     )
 
-    if sitio_sel != "🌐 Todos los Datasets (Red CIMMYT + USDA)":
-        df_vista = df[df["dataset_real"] == sitio_sel].copy()
-        st.info(f"Mostrando datos específicos de: **{sitio_sel}** ({len(df_vista)} parcelas experimentales).")
-    else:
-        df_vista = df.copy()
-        st.info(f"Mostrando red consolidada de **5 Datasets Reales** ({len(df_vista)} parcelas georreferenciadas totales).")
+    st.markdown("---")
 
-    # Métricas generales del dataset filtrado
+    # ─── EDA DEL DATASET MAESTRO MAÍZ (POBLACIÓN TOTAL CONSOLIDADA) ───
+    st.markdown("#### 🌽 Dataset Maestro Maíz Consolidado (N = 650 Parcelas)")
+    st.caption("Población completa unificada: análisis multi-modal global sin segmentaciones aisladas.")
+
     c1, c2, c3, c4 = st.columns(4)
-    c1.metric("Parcelas Monitoreadas", f"{len(df_vista):,}")
-    c2.metric("Rendimiento Promedio", f"{df_vista['rendimiento_real_ton_ha'].mean():.2f} ton/ha")
-    c3.metric("NDVI UAV (5cm)", f"{df_vista['uav_ndvi'].mean():.3f}")
-    c4.metric("NDVI Sentinel-2 (10m)", f"{df_vista['s2_ndvi'].mean():.3f}")
+    c1.metric("Parcelas Totales en Dataset Maestro", f"{len(df):,}")
+    c2.metric("Rendimiento Promedio Global", f"{df['rendimiento_real_ton_ha'].mean():.2f} ton/ha")
+    c3.metric("NDVI UAV Consolidado (5cm)", f"{df['uav_ndvi'].mean():.3f}")
+    c4.metric("NDVI Sentinel-2 Consolidado (10m)", f"{df['s2_ndvi'].mean():.3f}")
 
     col_g1, col_g2 = st.columns(2)
     with col_g1:
         st.markdown("##### 🔬 Comparativa Espectral: UAV (5cm) vs. Sentinel-2 (10m)")
         fig_ndvi = px.scatter(
-            df_vista, x="s2_ndvi", y="uav_ndvi", color="dataset_real",
-            labels={"s2_ndvi": "NDVI Sentinel-2 (10m)", "uav_ndvi": "NDVI UAV OpenDroneMap (5cm)", "dataset_real": "Dataset Real"},
-            title="Resolución Espectral: Satélite (10m) vs. Micro-variabilidad UAV (5cm)",
+            df, x="s2_ndvi", y="uav_ndvi", color="dataset_real",
+            labels={"s2_ndvi": "NDVI Sentinel-2 (10m)", "uav_ndvi": "NDVI UAV OpenDroneMap (5cm)", "dataset_real": "Agroecosistema de Origen"},
+            title="Resolución Espectral en el Dataset Maestro: Satélite (10m) vs. UAV (5cm)",
             color_discrete_sequence=px.colors.qualitative.Bold
         )
         st.plotly_chart(fig_ndvi, use_container_width=True)
-        corr_val = df_vista["s2_ndvi"].corr(df_vista["uav_ndvi"])
-        st.caption(f"Correlación espectral $r = {corr_val:.3f}$. El dron detecta variabilidad fina que el satélite promedia.")
+        corr_val = df["s2_ndvi"].corr(df["uav_ndvi"])
+        st.caption(f"Correlación espectral en el Dataset Maestro $r = {corr_val:.3f}$. El dron detecta variabilidad fina que el satélite promedia.")
         mostrar_interpretabilidad_explicabilidad(
-            interpretabilidad="Compara el vigor vegetativo NDVI medido a escala centimétrica por UAV (5 cm) versus escala satelital hectométrica por Sentinel-2 (10 m) discriminado por estación experimental real. Puntos sobre la diagonal denotan concordancia espectral; las dispersiones verticales evidencian micro-heterogeneidad del dosel que el sensor satelital suaviza por efecto de agregación de píxel.",
-            explicabilidad="Causalidad del sensor y arquitectura del dosel: El sensor multiespectral del dron discrimina el follaje del maíz respecto al suelo desnudo y sombras de entresurco. El píxel satelital integra firmas espectrales mixtas, explicando por qué variaciones sub-parcelarias de estrés hídrico temprano en sitios como USDA Bushland y CIMMYT Chiapas son detectadas con mayor sensibilidad por el UAV."
+            interpretabilidad="Compara el vigor vegetativo NDVI medido a escala centimétrica por UAV (5 cm) versus escala satelital hectométrica por Sentinel-2 (10 m) en la totalidad del Dataset Maestro Maíz. Puntos sobre la diagonal denotan concordancia espectral; las dispersiones verticales evidencian micro-heterogeneidad del dosel que el sensor satelital suaviza por efecto de agregación de píxel.",
+            explicabilidad="Causalidad del sensor y arquitectura del dosel: El sensor multiespectral del dron discrimina el follaje del maíz respecto al suelo desnudo y sombras de entresurco en todas las regiones del Dataset Maestro. El píxel satelital integra firmas espectrales mixtas, explicando por qué variaciones sub-parcelarias de estrés hídrico temprano son detectadas con mayor sensibilidad por el UAV."
         )
 
     with col_g2:
-        st.markdown("##### 🌾 Distribución de Rendimiento Ground Truth por Dataset Real")
+        st.markdown("##### 🌾 Distribución de Rendimiento Cosechado en el Dataset Maestro Maíz")
         fig_dist = px.histogram(
-            df_vista, x="rendimiento_real_ton_ha", color="dataset_real",
-            marginal="box", nbins=25,
-            labels={"rendimiento_real_ton_ha": "Rendimiento Real (ton/ha)", "dataset_real": "Dataset Real"},
-            title="Distribución de Rendimiento Cosechado por Sitio Experimental",
+            df, x="rendimiento_real_ton_ha", color="dataset_real",
+            marginal="box", nbins=30,
+            labels={"rendimiento_real_ton_ha": "Rendimiento Real (ton/ha)", "dataset_real": "Agroecosistema de Origen"},
+            title="Distribución Global de Rendimiento Cosechado (Dataset Maestro)",
             color_discrete_sequence=px.colors.qualitative.Safe
         )
         st.plotly_chart(fig_dist, use_container_width=True)
         mostrar_interpretabilidad_explicabilidad(
-            interpretabilidad="Histograma y boxplot de la variable objetivo (rendimiento real ground truth en ton/ha) desglosada por cada uno de los datasets reales. Permite evaluar la dispersión, la mediana productiva y los rangos intercuartílicos de cada agroecosistema (desde ~7.8 ton/ha en Chiapas hasta >12 ton/ha en El Bajío).",
-            explicabilidad="Condicionamiento agroclimático regional: Las diferencias de distribución entre datasets reales responden al gradiente térmico, la radiación incidente, el tipo de suelo y el régimen hídrico: El Bajío y México Central operan con híbridos de alto potencial bajo riego/riego complementario, mientras que Bushland y Colorado experimentan limitaciones de evapotranspiración estival extrema."
+            interpretabilidad="Histograma y boxplot de la variable objetivo (rendimiento real ground truth en ton/ha) consolidada en el Dataset Maestro Maíz. Ilustra el gradiente continuo de productividad agronómica abarcado por la red unificada, desde ~5.5 ton/ha en parcelas de temporal hasta >13.5 ton/ha en valles tecnificados.",
+            explicabilidad="Heterogeneidad agroclimática capturada por el Dataset Maestro: La unión de los 5 datasets permite que la base de datos maestra no tenga sesgo local. Integra regímenes pluviométricos contrastantes, suelos vertisoles, inceptisoles y franco-arenosos, proporcionando el soporte empírico necesario para que los modelos predictivos aprendan respuestas biológicas universales."
         )
 
     st.markdown("---")
@@ -160,56 +336,56 @@ def render_tab_1_eda(df):
     with col_s1:
         st.markdown("##### 🌍 Propiedades Edáficas (SoilGrids 2.0) vs. Rendimiento")
         fig_suelo = px.scatter(
-            df_vista, x="soil_materia_organica", y="rendimiento_real_ton_ha",
+            df, x="soil_materia_organica", y="rendimiento_real_ton_ha",
             size="soil_arcilla_pct", color="dataset_real",
             labels={
                 "soil_materia_organica": "Materia Orgánica (%)",
                 "rendimiento_real_ton_ha": "Rendimiento Real (ton/ha)",
-                "dataset_real": "Dataset Real", "soil_arcilla_pct": "Arcilla %"
+                "dataset_real": "Agroecosistema de Origen", "soil_arcilla_pct": "Arcilla %"
             },
-            title="Materia Orgánica, Contenido de Arcilla y Rendimiento por Sitio"
+            title="Materia Orgánica, Arcilla y Rendimiento en el Dataset Maestro"
         )
         st.plotly_chart(fig_suelo, use_container_width=True)
         mostrar_interpretabilidad_explicabilidad(
-            interpretabilidad="Diagrama multivariado que analiza el rendimiento en función del contenido de materia orgánica del suelo (eje X) y el porcentaje de arcilla (tamaño del marcador), agrupado por dataset real.",
-            explicabilidad="Dinámica edáfica y retención de humedad: Los suelos vertisoles de CIMMYT Bajío con alta arcilla y los inceptisoles de México Central presentan mayor capacidad de retención de humedad y cationes, potenciando el rendimiento frente a los suelos más ligeros y arenosos de Colorado."
+            interpretabilidad="Diagrama multivariado del Dataset Maestro que analiza el rendimiento en función del contenido de materia orgánica del suelo (eje X) y el porcentaje de arcilla (tamaño del marcador), agrupado por agroecosistema de procedencia.",
+            explicabilidad="Dinámica edáfica y retención de humedad: La homologación edáfica refleja que los perfiles pesados con alta materia orgánica y arcilla sustentan techos de rendimiento superiores, mientras que suelos con baja retención hídrica requieren manejo hídrico preciso."
         )
 
     with col_s2:
         st.markdown("##### 🚜 Manejo Agronómico (OpenFarm) vs. Rendimiento")
         fig_manejo = px.scatter(
-            df_vista, x="dosis_nitrogeno_kgha", y="rendimiento_real_ton_ha",
+            df, x="dosis_nitrogeno_kgha", y="rendimiento_real_ton_ha",
             color="dataset_real", size="densidad_plantas_m2",
             labels={
                 "dosis_nitrogeno_kgha": "Dosis Nitrógeno (kg/ha)",
                 "rendimiento_real_ton_ha": "Rendimiento Real (ton/ha)",
-                "dataset_real": "Dataset Real", "densidad_plantas_m2": "Plantas/m²"
+                "dataset_real": "Agroecosistema de Origen", "densidad_plantas_m2": "Plantas/m²"
             },
-            title="Respuesta al Nitrógeno y Densidad de Siembra por Dataset"
+            title="Respuesta al Nitrógeno y Densidad en el Dataset Maestro"
         )
         st.plotly_chart(fig_manejo, use_container_width=True)
         mostrar_interpretabilidad_explicabilidad(
-            interpretabilidad="Curva de respuesta agronómica del rendimiento real ante la dosis de nitrógeno aplicada (kg N/ha), estratificada por dataset real y modulada por la densidad de siembra (tamaño del punto).",
-            explicabilidad="Ley de rendimientos decrecientes y especificidad de sitio: En ambientes altamente tecnificados (CIMMYT Bajío), dosis superiores a 200 kg N/ha con densidades de 8.5 pl/m² logran el techo de biomasa. En zonas semiáridas (Bushland), fertilizaciones excesivas con densidad alta inducen estrés hídrico terminal (haying-off)."
+            interpretabilidad="Curva de respuesta agronómica del rendimiento real ante la dosis de nitrógeno aplicada (kg N/ha) en el Dataset Maestro Maíz, modulada por la densidad de siembra (tamaño del punto).",
+            explicabilidad="Respuesta multi-entorno y rendimientos decrecientes: La consolidación multi-sitio permite observar la meseta de absorción nitrogenada en diferentes potenciales genéticos, evitando la sobre-fertilización ineficiente."
         )
 
     # Matriz de Correlación
-    st.markdown("##### 🔗 Matriz de Correlación Cruzada Multi-Modal")
+    st.markdown("##### 🔗 Matriz de Correlación Cruzada Multi-Modal (Dataset Maestro Maíz)")
     cols_corr = [
         "rendimiento_real_ton_ha", "uav_ndvi", "s2_ndvi", "s2_ndre",
         "soil_materia_organica", "soil_arcilla_pct", "soil_ph",
         "dosis_nitrogeno_kgha", "densidad_plantas_m2", "apsim_rendimiento_sim"
     ]
-    corr_matrix = df_vista[cols_corr].corr()
+    corr_matrix = df[cols_corr].corr()
     fig_heat = px.imshow(
         corr_matrix, text_auto=".2f", aspect="auto",
         color_continuous_scale="RdBu_r", zmin=-1, zmax=1,
-        title="Matriz de Correlaciones Pearson entre Fuentes Multi-Sensor y Manejo"
+        title="Matriz de Correlaciones Pearson del Dataset Maestro Maíz Consolidado"
     )
     st.plotly_chart(fig_heat, use_container_width=True)
     mostrar_interpretabilidad_explicabilidad(
-        interpretabilidad="Mapa de calor de correlaciones lineales de Pearson ($r \in [-1, 1]$) entre variables espectrales (UAV, S2), fisicoquímicas del suelo (SoilGrids), insumos de manejo y simulación biofísica APSIM.",
-        explicabilidad="Alineamiento y complementariedad de predictores: Se constata fuerte correlación positiva entre `uav_ndvi`, `apsim_rendimiento_sim` y el rendimiento real ($r \ge 0.72$), confirmando que el vigor fotosintético y el balance de biomasa son los determinantes principales sin redundancia colineal severa."
+        interpretabilidad="Mapa de calor de correlaciones lineales de Pearson ($r \in [-1, 1]$) entre variables espectrales (UAV, S2), fisicoquímicas del suelo (SoilGrids), insumos de manejo y simulación biofísica APSIM sobre las 650 parcelas consolidadas.",
+        explicabilidad="Alineamiento global y complementariedad de predictores: En el Dataset Maestro Maíz, se consolida una correlación robusta entre `uav_ndvi`, `apsim_rendimiento_sim` y el rendimiento real ($r \ge 0.72$), confirmando que la combinación de vigor fotosintético centimétrico y modelado de procesos fisiológicos gobierna la cosecha sin problemas de colinealidad destructiva."
     )
 
 # ══════════════════════════════════════════════════════════════════
