@@ -1,0 +1,102 @@
+{
+    "timestamp_iso": "2026-09-27T13:02:15.250580",
+    "execution_date": "2026-09-27 13:02:15",
+    "python_version": "3.11.9 (tags/v3.11.9:de54cf5, Apr  2 2024, 10:12:12) [MSC v.1938 64 bit (AMD64)]",
+    "os_name": "Windows",
+    "os_release": "10",
+    "os_version": "10.0.26200",
+    "architecture": "AMD64",
+    "random_state": 42,
+    "library_versions": {
+        "pandas": "3.0.5",
+        "numpy": "2.4.6",
+        "scipy": "1.17.1",
+        "statsmodels": "0.15.0",
+        "sklearn": "1.9.0",
+        "xgboost": "3.2.0",
+        "lightgbm": "4.7.0",
+        "catboost": "1.2.10",
+        "pingouin": "0.7.0",
+        "scikit_posthocs": "0.17.0",
+        "pymoo": "0.6.2",
+        "SALib": "instalado",
+        "langgraph": "instalado",
+        "shap": "0.51.0",
+        "matplotlib": "3.11.1",
+        "seaborn": "0.13.2",
+        "joblib": "1.6.0"
+    },
+    "dataset_metadata": {
+        "input_dataset": "data/dataset_maestro_maiz_harmonizado.csv",
+        "raw_records": 5011,
+        "raw_columns": 40,
+        "clean_records": 5009,
+        "clean_columns": 40,
+        "train_records": 3506,
+        "validation_records": 751,
+        "test_records": 752,
+        "train_ratio": 0.7,
+        "val_ratio": 0.15,
+        "test_ratio": 0.15,
+        "target_variable": "yield_ton_ha",
+        "data_leakage_excluded_variables": [
+            "biomass_ton_ha",
+            "water_productivity_kg_m3",
+            "total_water_mm",
+            "max_lai",
+            "et_mm",
+            "record_id",
+            "field_id",
+            "site"
+        ]
+    },
+    "best_hyperparameters": {
+        "random_forest": {
+            "n_estimators": 150,
+            "min_samples_split": 2,
+            "min_samples_leaf": 1,
+            "max_features": 0.8,
+            "max_depth": 20,
+            "tuning_time_sec": 45.07,
+            "best_cv_rmse": 1.007
+        },
+        "xgboost": {
+            "subsample": 0.85,
+            "reg_lambda": 5.0,
+            "reg_alpha": 0.0,
+            "n_estimators": 200,
+            "max_depth": 8,
+            "learning_rate": 0.05,
+            "colsample_bytree": 0.7,
+            "tuning_time_sec": 21.23,
+            "best_cv_rmse": 0.9996
+        },
+        "lightgbm": {
+            "subsample": 0.7,
+            "num_leaves": 31,
+            "n_estimators": 150,
+            "min_child_samples": 10,
+            "learning_rate": 0.1,
+            "colsample_bytree": 1.0,
+            "tuning_time_sec": 53.74,
+            "best_cv_rmse": 1.0044
+        },
+        "catboost": {
+            "learning_rate": 0.15,
+            "l2_leaf_reg": 5,
+            "iterations": 150,
+            "depth": 8,
+            "tuning_time_sec": 54.47,
+            "best_cv_rmse": 1.0244
+        },
+        "gradient_boosting": {
+            "subsample": 0.85,
+            "n_estimators": 200,
+            "min_samples_split": 2,
+            "max_depth": 7,
+            "learning_rate": 0.15,
+            "tuning_time_sec": 58.52,
+            "best_cv_rmse": 1.0245
+        }
+    }
+}

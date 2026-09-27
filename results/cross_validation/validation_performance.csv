@@ -1,0 +1,6 @@
+model,Validation_RMSE,Validation_MAE,Validation_R2,Validation_MAPE
+xgboost,0.9509,0.6822,0.8499,26.34
+lightgbm,0.9676,0.7051,0.8446,26.6
+random_forest,0.9705,0.6862,0.8436,25.72
+gradient_boosting,0.994,0.7207,0.836,26.1
+catboost,1.0053,0.7516,0.8322,28.98

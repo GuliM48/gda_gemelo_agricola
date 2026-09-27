@@ -1,0 +1,9 @@
+Variable,Motivo_Exclusion,Detalle
+biomass_ton_ha,Fuga de Información Post-Cosecha / Co-dependencia del Target,La biomasa aérea se determina al momento de la cosecha y guarda una relación matemática directa con el rendimiento a través del Índice de Cosecha (HI = Rendimiento / Biomasa). Usarla como predictor antes de cosecha constituye fuga prospectiva.
+water_productivity_kg_m3,Fuga Matemática Directa del Target (Target Leakage),"La productividad del agua se calcula algebraicamente como (Rendimiento_kg / Agua_m3). El rendimiento figura en el numerador; por tanto, contiene la variable objetivo implícita."
+total_water_mm,Ambigüedad Metodológica y Dependencia de Balance Posterior,En los experimentos de riego se mide como agua de riego + lluvia + agotamiento de perfil en cosecha. Se reemplaza rigurosamente por la oferta hídrica ex-ante (lluvia + riego aplicado).
+max_lai,Ausencia Extrema (>98% NaN) y Medición Fenológica Tardía,"Índice de área foliar máxima sólo medido en escasas parcelas intensivas; su inclusión obligaría a imputar el 98% del dataset, desvirtuando la generalización agronómica."
+et_mm,Ausencia Severa (>97% NaN) y Co-dependencia de Rendimiento,La evapotranspiración estacional sólo fue modelada en parcelas de Bajío y Colorado.
+record_id,Identificador Único No Predictivo,Clave primaria sin contenido biofísico explicativo.
+field_id,Identificador Local Arbitrario,Código de lote que induciría sobreajuste memorístico.
+site,Identificador de Sitio Específico,"Evita memorización de coordenadas locales; la varianza espacial se captura con latitud, longitud, elevación y suelo."

@@ -1,0 +1,16 @@
+Modelo,Metrica,Media_Bootstrap,IC_95_Inf,IC_95_Sup,Amplitud_IC
+random_forest,RMSE,0.9686,0.899,1.0431,0.1441
+random_forest,MAE,0.6857,0.6382,0.7354,0.0972
+random_forest,R2,0.8424,0.808,0.873,0.065
+xgboost,RMSE,0.9491,0.882,1.0238,0.1418
+xgboost,MAE,0.6816,0.6364,0.7295,0.0931
+xgboost,R2,0.8486,0.8145,0.8772,0.0627
+lightgbm,RMSE,0.9664,0.9033,1.0359,0.1325
+lightgbm,MAE,0.7044,0.6588,0.7499,0.0911
+lightgbm,R2,0.8432,0.8097,0.8707,0.061
+catboost,RMSE,1.0036,0.9394,1.075,0.1357
+catboost,MAE,0.7509,0.7041,0.7992,0.0951
+catboost,R2,0.8308,0.7951,0.8613,0.0662
+gradient_boosting,RMSE,0.9926,0.9264,1.0659,0.1396
+gradient_boosting,MAE,0.7202,0.6739,0.7744,0.1005
+gradient_boosting,R2,0.8345,0.7988,0.8649,0.0661

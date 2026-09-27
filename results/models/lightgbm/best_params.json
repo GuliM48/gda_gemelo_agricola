@@ -1,0 +1,10 @@
+{
+    "subsample": 0.7,
+    "num_leaves": 31,
+    "n_estimators": 150,
+    "min_child_samples": 10,
+    "learning_rate": 0.1,
+    "colsample_bytree": 1.0,
+    "tuning_time_sec": 53.74,
+    "best_cv_rmse": 1.0044
+}

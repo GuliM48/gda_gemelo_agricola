@@ -1,0 +1,4 @@
+Factor_Comparado,Variable_Dependiente,Grupos,N_Total,F_Stat,ddof1,ddof2,p_value,Efecto_np2,Interpretacion
+macro_region_mexico,yield_ton_ha,"Sureste, Centro-Occidente, Centro, External_USA",5009,1023.6805,3,186.79,1.1708241499625756e-115,0.4251,Diferencias altamente significativas (p < 0.001)
+source_dataset,yield_ton_ha,"CIMMYT_CHIAPAS_2012_2018, CIMMYT_BAJIO_FARMERS_2019_2020, CIMMYT_BAJIO_FIELD_EXPERIMENT_2017_2019, CIMMYT_TEXCOCO_1999_2019, USDA_ARS_COLORADO_2012_2013",5009,806.1605,4,101.08,1.0397664088734315e-75,0.4273,Diferencias altamente significativas (p < 0.001)
+tillage,yield_ton_ha,"Conventional, No-till, Reduced, PB, CB, PBW, CT",4904,171.9513,6,155.55,5.322127714137369e-66,0.1834,Diferencias significativas (p < 0.05)

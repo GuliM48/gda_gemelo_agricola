@@ -1,0 +1,8 @@
+regla_aplicada,registros_afectados,cantidad_eliminada,justificacion
+Eliminación de duplicados exactos,0,0,Registros completamente idénticos en todas las variables reflejan duplicación redundante de muestreo o inserción.
+Auditoría de unicidad de identificadores (record_id),0,0,Verificación de que cada registro posea clave primaria única sin colisiones.
+Estandarización de cadenas y normalización de nulos textuales,5011,0,"Remoción de espacios en blanco y homologación de strings ""nan""/""None"" a NaN formal de pandas."
+Conversión estricta a tipos numéricos continuos,5011,0,Aseguramiento de tipado float64 e int64 para evitar errores de coerción o tipado débil en modelos.
+Auditoría de no negatividad en variables agronómicas biofísicas,0,0,"Variables como lluvia, pH, nitrógeno, rendimiento o radiación no pueden admitir magnitudes negativas."
+Comprobación de rangos agronómicos biofísicos plausibles,0,0,"Verificación de umbrales biológicos: pH (3.5-10), arcilla (0-100%), MO (0-15%), rinde (0-25 t/ha). Hallados fuera de rango: 0."
+Eliminación de registros con variable objetivo (yield_ton_ha) ausente,2,2,"El aprendizaje supervisado y la calibración inferencial requieren ground truth de rendimiento. IDs eliminados: ['COL_51', 'COL_96']."

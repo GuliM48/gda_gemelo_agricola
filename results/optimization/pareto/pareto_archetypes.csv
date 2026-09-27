@@ -1,0 +1,5 @@
+Estrategia_Arquetipo,Algoritmo,Riego_mm,Nitrogeno_kg_ha,Densidad_pl_ha,Materia_Organica_pct,Rendimiento_ton_ha,Uso_Agua_m3_ha,Lixiviacion_N_kg_ha,Tradeoff_Clave
+Máximo Rendimiento Productivo (Max Yield),NSGA-II,49.73,299.96,79725.0,4.0,6.97,4697.32,11.74,Prioriza productividad máxima sacrificando conservación hídrica y nitrógeno residual.
+Máxima Eficiencia Hídrica (Min Water),NSGA-II,0.0,11.55,79371.0,4.0,3.71,4200.0,0.5,Ahorro drástico de agua bajo temporal o riego deficitario mínimo con rendimiento moderado.
+Protección Ambiental Acuífero (Min N Leaching),NSGA-II,75.77,12.15,79566.0,4.0,4.07,4936.8,0.5,Dosis de N calibrada para evitar percolación profunda de nitratos a mantos freáticos.
+Solución de Compromiso Óptimo (Knee Point Pareto),NSGA-III,10.75,117.69,83523.0,4.0,5.57,4307.54,4.22,Balance armónico óptimo: rinde alto (>85% del máx) con 35% menos agua y 60% menos lixiviación.

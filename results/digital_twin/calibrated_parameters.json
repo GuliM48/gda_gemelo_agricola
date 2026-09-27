@@ -1,0 +1,9 @@
+{
+    "radiation_use_efficiency_g_mj": 1.5601,
+    "kc_max_transpiration": 0.8,
+    "harvest_index_base": 0.4711,
+    "nitrogen_leach_partition_factor": 0.18,
+    "calibration_loss": 2.7332,
+    "n_calibration_samples": 3004,
+    "n_validation_samples": 2005
+}

@@ -1,0 +1,4 @@
+Variable,Factor,Descripcion,N_Grupos,N_Total,H_Stat,df,p_value,Efecto_Epsilon2,Interpretacion
+yield_ton_ha,macro_region_mexico,Rendimiento por Macro-Región,4,5009,743.363,3,8.296571548441485e-161,0.1479,Distribuciones significativamente diferentes (p < 0.05)
+nitrogen_kg_ha,macro_region_mexico,Dosis N por Macro-Región,3,4735,232.5465,2,3.18547652752716e-51,0.0487,Distribuciones significativamente diferentes (p < 0.05)
+irrigation_mm,source_dataset,Lámina de Riego por Fuente (Sitios Irrigados),3,172,103.2296,2,3.83690024504231e-23,0.599,Distribuciones significativamente diferentes (p < 0.05)

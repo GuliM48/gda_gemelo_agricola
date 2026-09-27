@@ -1,0 +1,13 @@
+Variable,Factor,Grupo_1,Grupo_2,p_value_ajustado_Holm,Significativo_alpha_005
+yield_ton_ha,macro_region_mexico,Centro,Centro-Occidente,2.075378090807766e-08,True
+yield_ton_ha,macro_region_mexico,Centro,External_USA,3.7308185725698154e-10,True
+yield_ton_ha,macro_region_mexico,Centro,Sureste,3.687752995269732e-55,True
+yield_ton_ha,macro_region_mexico,Centro-Occidente,External_USA,0.8148764704794724,False
+yield_ton_ha,macro_region_mexico,Centro-Occidente,Sureste,4.982302123375694e-53,True
+yield_ton_ha,macro_region_mexico,External_USA,Sureste,7.919754084442045e-66,True
+nitrogen_kg_ha,macro_region_mexico,Centro-Occidente,External_USA,1.0178363249634994e-06,True
+nitrogen_kg_ha,macro_region_mexico,Centro-Occidente,Sureste,8.119478698492058e-37,True
+nitrogen_kg_ha,macro_region_mexico,External_USA,Sureste,2.537531393861835e-17,True
+irrigation_mm,source_dataset,CIMMYT_BAJIO_FARMERS_2019_2020,CIMMYT_BAJIO_FIELD_EXPERIMENT_2017_2019,2.904292974655982e-06,True
+irrigation_mm,source_dataset,CIMMYT_BAJIO_FARMERS_2019_2020,USDA_ARS_COLORADO_2012_2013,0.03484074477738885,True
+irrigation_mm,source_dataset,CIMMYT_BAJIO_FIELD_EXPERIMENT_2017_2019,USDA_ARS_COLORADO_2012_2013,1.0807446063250231e-23,True

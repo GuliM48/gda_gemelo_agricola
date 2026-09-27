@@ -1,0 +1,14 @@
+Variable,N_Validos,N_Categorias,Categoria_Dominante,Frecuencia_Dominante,Porcentaje_Dominante
+record_id,5009,5009,BAJ_E_1,1,0.02
+source_dataset,5009,5,CIMMYT_CHIAPAS_2012_2018,4585,91.54
+country,5009,2,Mexico,4915,98.12
+state,5009,5,Chiapas,4585,91.54
+site,5009,83,3.241,487,9.72
+macro_region_mexico,5009,4,Sureste,4585,91.54
+field_id,4701,4679,2,5,0.1
+cycle,78,1,Summer,78,1.56
+crop,5009,1,Maize,5009,100.0
+treatment,5009,26,Hybrid,3034,60.57
+tillage,4915,8,Conventional,2103,41.98
+residue,308,5,Keep,84,1.68
+irrigation_method,22,2,Furrow,20,0.4

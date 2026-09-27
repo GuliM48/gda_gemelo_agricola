@@ -1,0 +1,5 @@
+Variable,Descripcion,Observado_Medio,Simulado_Medio,RMSE,MAE,R2,Sesgo_PBIAS_pct,Error_Relativo_NRMSE_pct
+yield_ton_ha,Rendimiento de Grano (ton/ha),3.98,3.76,2.5618,1.6473,-0.005,-5.37,64.44
+biomass_ton_ha,Biomasa Aérea Total (ton/ha),9.35,8.77,5.6233,3.7207,0.0525,-6.27,60.13
+water_use_m3_ha,Consumo de Agua (m³/ha),1251.96,4122.06,3108.5379,3075.8268,-6.1418,229.25,248.29
+nitrogen_leaching_kg_ha,Lixiviación de Nitrógeno (kg N/ha),1.75,5.95,7.9174,4.3234,-1.3134,238.87,451.21

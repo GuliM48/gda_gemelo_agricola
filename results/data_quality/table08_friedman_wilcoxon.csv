@@ -1,0 +1,11 @@
+Metrica,Modelo_1,Modelo_2,Media_M1,Media_M2,Diferencia_Media,Wilcoxon_W,p_value_raw,p_value_Holm,Significativo_Holm
+RMSE,xgboost,gradient_boosting,0.9984,1.0245,-0.0261,0.0,0.0625,0.625,False
+RMSE,xgboost,catboost,0.9984,1.0244,-0.026,0.0,0.0625,0.625,False
+RMSE,lightgbm,gradient_boosting,1.0044,1.0245,-0.02,1.0,0.125,1.0,False
+RMSE,random_forest,catboost,1.007,1.0244,-0.0173,2.0,0.1875,1.0,False
+RMSE,lightgbm,catboost,1.0044,1.0244,-0.0199,2.0,0.1875,1.0,False
+RMSE,random_forest,gradient_boosting,1.007,1.0245,-0.0174,3.0,0.3125,1.0,False
+RMSE,xgboost,lightgbm,0.9984,1.0044,-0.0061,4.0,0.4375,1.0,False
+RMSE,random_forest,xgboost,1.007,0.9984,0.0087,4.0,0.4375,1.0,False
+RMSE,random_forest,lightgbm,1.007,1.0044,0.0026,6.0,0.8125,1.0,False
+RMSE,catboost,gradient_boosting,1.0244,1.0245,-0.0001,7.0,1.0,1.0,False

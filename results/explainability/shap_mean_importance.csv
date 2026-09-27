@@ -1,0 +1,70 @@
+feature,mean_abs_shap
+irrigation_mm_imputed,0.5141716
+treatment_Landrace,0.5019014
+elevation_m,0.25520715
+latitude,0.23518385
+year,0.17018454
+npk_total,0.15141813
+is_irrigated,0.11642852
+nitrogen_kg_ha,0.10813576
+rainfall_mm,0.097429685
+phosphorus_kg_ha,0.08614702
+potassium_kg_ha,0.08434257
+vapor_pressure_mean_pa,0.08417338
+longitude,0.08413497
+slope,0.0758548
+nitrogen_per_water,0.071403146
+water_input_total_mm,0.06918901
+radiation_mean,0.05625882
+npk_ratio_n_p,0.037142303
+thermal_amplitude,0.036553007
+tillage_No-till,0.030570144
+soil_organic_matter_pct,0.028492838
+cec,0.026958609
+soil_ph,0.024497023
+temperature_mean_c,0.024476528
+tmax_mean_c,0.024464328
+treatment_Hybrid,0.023861881
+tmin_mean_c,0.022025483
+tillage_PB,0.02076971
+clay_pct,0.018197466
+macro_region_mexico_Sureste,0.016711518
+"treatment_PB, K, NT",0.01575801
+tillage_Conventional,0.014412238
+tillage_Reduced,0.010528674
+"treatment_PB, R, NT",0.010392223
+macro_region_mexico_Centro,0.009896264
+tillage_CB,0.008217342
+treatment_80/50,0.005062935
+treatment_40/40,0.003733549
+"treatment_PB, P, TR",0.003701398
+treatment_100/50,0.0035724917
+treatment_65/40,0.0020471392
+treatment_CM-H-R-RS,0.0015958026
+"treatment_CB, K, NT",0.0013630894
+source_dataset_CIMMYT_TEXCOCO_1999_2019,0.001186264
+"treatment_PB, R, TR",0.00089948607
+"treatment_PB, P, NT",0.00087421655
+treatment_80/40,0.0008665391
+treatment_65/65,0.00081234355
+treatment_50/50,0.0007005257
+treatment_65/50,0.00062113354
+treatment_CT,0.00047594894
+tillage_CT,0.00045750127
+treatment_CM-CPA-D-RS,0.000414972
+tillage_Conservation,0.0003420873
+treatment_100/100,0.00019955976
+tillage_PBW,0.00016037928
+treatment_80/80,0.00014270832
+treatment_CM-H-R-RG,0.00013857379
+treatment_65/80,0.000115053466
+treatment_CM-CPA-D-RG,7.975176e-05
+source_dataset_CIMMYT_BAJIO_FARMERS_2019_2020,2.5273523e-05
+treatment_80/65,1.6782642e-05
+treatment_CA,1.097278e-05
+source_dataset_USDA_ARS_COLORADO_2012_2013,0.0
+macro_region_mexico_External_USA,0.0
+macro_region_mexico_Centro-Occidente,0.0
+source_dataset_CIMMYT_CHIAPAS_2012_2018,0.0
+source_dataset_CIMMYT_BAJIO_FIELD_EXPERIMENT_2017_2019,0.0
+tillage_Desconocido,0.0

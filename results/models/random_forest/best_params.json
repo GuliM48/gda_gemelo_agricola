@@ -1,0 +1,9 @@
+{
+    "n_estimators": 150,
+    "min_samples_split": 2,
+    "min_samples_leaf": 1,
+    "max_features": 0.8,
+    "max_depth": 20,
+    "tuning_time_sec": 45.07,
+    "best_cv_rmse": 1.007
+}

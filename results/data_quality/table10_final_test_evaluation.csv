@@ -1,0 +1,5 @@
+Metrica,Valor_Test,IC_95_Inf,IC_95_Sup
+RMSE (ton/ha),1.0153,0.9171,1.1322
+MAE (ton/ha),0.6936,0.6425,0.7491
+R² (Coef. Determinación),0.8447,0.8099,0.8738
+MAPE (%),33.52,22.83,46.45

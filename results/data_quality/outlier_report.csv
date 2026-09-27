@@ -1,0 +1,11 @@
+Variable,N_Disponibles,Mediana,IQR,Limite_Inf_IQR,Limite_Sup_IQR,Outliers_IQR,Pct_IQR,Outliers_MAD_Z3,Pct_MAD,Clasificacion,Accion
+yield_ton_ha,5009,4.0,3.36,-3.05,10.41,131,2.62,110,2.2,Posiblemente válidos (Conservados por plausibilidad agroecológica),Conservados para no truncar la varianza real multi-ambiente
+rainfall_mm,4735,115.6,31.6,56.6,183.0,162,3.42,174,3.67,Posiblemente válidos (Conservados por plausibilidad agroecológica),Conservados para no truncar la varianza real multi-ambiente
+nitrogen_kg_ha,4735,112.95,92.0,-74.0,294.0,68,1.44,53,1.12,Posiblemente válidos (Conservados por plausibilidad agroecológica),Conservados para no truncar la varianza real multi-ambiente
+temperature_mean_c,4679,24.27,3.01,17.69,29.72,147,3.14,363,7.76,Posiblemente válidos (Conservados por plausibilidad agroecológica),Conservados para no truncar la varianza real multi-ambiente
+soil_ph,4585,6.79,0.71,5.55,8.41,264,5.76,0,0.0,Posiblemente válidos (Conservados por plausibilidad agroecológica),Conservados para no truncar la varianza real multi-ambiente
+clay_pct,4585,28.0,14.0,2.0,58.0,0,0.0,6,0.13,Posiblemente válidos (Conservados por plausibilidad agroecológica),Conservados para no truncar la varianza real multi-ambiente
+soil_organic_matter_pct,4585,1.17,1.06,-0.62,3.62,130,2.84,838,18.28,Posiblemente válidos (Conservados por plausibilidad agroecológica),Conservados para no truncar la varianza real multi-ambiente
+cec,4585,21.12,11.42,-0.96,44.74,31,0.68,31,0.68,Posiblemente válidos (Conservados por plausibilidad agroecológica),Conservados para no truncar la varianza real multi-ambiente
+slope,4585,3.04,7.4,-9.76,19.83,245,5.34,715,15.59,Posiblemente válidos (Conservados por plausibilidad agroecológica),Conservados para no truncar la varianza real multi-ambiente
+elevation_m,4641,718.0,519.0,-185.5,1890.5,164,3.53,855,18.42,Posiblemente válidos (Conservados por plausibilidad agroecológica),Conservados para no truncar la varianza real multi-ambiente

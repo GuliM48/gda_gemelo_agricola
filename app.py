@@ -1,8 +1,11 @@
+import importlib
 from pathlib import Path
 import streamlit as st
 from streamlit_option_menu import option_menu
 from config.i18n import t
 from config.roles import verificar_permiso
+import modules.ia_engine
+importlib.reload(modules.ia_engine)
 from modules.gemelo import interfaz_gemelo
 from modules.ia_engine import interfaz_motor_ia
 from modules.alertas import panel_alertas_independiente

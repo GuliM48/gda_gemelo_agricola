@@ -1,0 +1,8 @@
+{
+    "learning_rate": 0.15,
+    "l2_leaf_reg": 5,
+    "iterations": 150,
+    "depth": 8,
+    "tuning_time_sec": 54.47,
+    "best_cv_rmse": 1.0244
+}

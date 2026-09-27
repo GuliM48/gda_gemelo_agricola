@@ -1,0 +1,5 @@
+Metrica,N_Folds,K_Modelos,Estadistico_Friedman,df,p_value,Kendalls_W,Significativo_alpha_005,Interpretacion
+RMSE,5,5,8.8,4,0.06629763547656965,0.44,False,No se detectan diferencias significativas entre modelos
+MAE,5,5,10.4,4,0.034202699408716716,0.52,True,Diferencias estadísticamente significativas entre modelos
+R2,5,5,9.2245,4,0.05572680001940187,0.4612,False,No se detectan diferencias significativas entre modelos
+MAPE,5,5,11.84,4,0.0185815852245204,0.592,True,Diferencias estadísticamente significativas entre modelos
