@@ -1,0 +1,191 @@
+{
+  "name": "GDA — Optimización Completa (ABM + Pareto + Sobol)",
+  "description": "Diseño experimental por hipercubo latino, lote de simulaciones del gemelo ABM (Mesa + FAO-56), optimización multiobjetivo NSGA-III y análisis de sensibilidad global de Sobol.",
+  "tags": ["GDA", "ABM", "Pareto", "Sobol"],
+  "data": {
+    "nodes": [
+      {
+        "id": "panel-control",
+        "type": "genericNode",
+        "position": { "x": 100, "y": 300 },
+        "data": {
+          "type": "genericNode",
+          "node": {
+            "template": {
+              "region": { "type": "DropdownInput", "value": "NOROESTE" },
+              "objetivo": { "type": "DropdownInput", "value": "max_rendimiento_min_agua" },
+              "num_escenarios": { "type": "IntInput", "value": 10 },
+              "semilla": { "type": "IntInput", "value": 42 },
+              "tipo": { "type": "str", "value": "GDAPanelControlUsuario" }
+            },
+            "type": "GDAPanelControlUsuario",
+            "base_classes": ["DataFrame"]
+          }
+        }
+      },
+      {
+        "id": "disenar-escenarios",
+        "type": "genericNode",
+        "position": { "x": 400, "y": 300 },
+        "data": {
+          "type": "genericNode",
+          "node": {
+            "template": {
+              "n_escenarios": { "type": "IntInput", "value": 10 },
+              "region": { "type": "DropdownInput", "value": "NOROESTE" },
+              "semilla": { "type": "IntInput", "value": 42 },
+              "tipo": { "type": "str", "value": "GDADisenarEscenariosLHS" }
+            },
+            "type": "GDADisenarEscenariosLHS",
+            "base_classes": ["DataFrame"]
+          }
+        }
+      },
+      {
+        "id": "lote-simulaciones",
+        "type": "genericNode",
+        "position": { "x": 700, "y": 300 },
+        "data": {
+          "type": "genericNode",
+          "node": {
+            "template": {
+              "escenarios": { "type": "DataFrameInput", "value": null },
+              "region": { "type": "DropdownInput", "value": "NOROESTE" },
+              "num_dias": { "type": "IntInput", "value": 150 },
+              "filtrar_fallidos": { "type": "BoolInput", "value": true },
+              "tipo": { "type": "str", "value": "GDAEjecutarLoteSimulaciones" }
+            },
+            "type": "GDAEjecutarLoteSimulaciones",
+            "base_classes": ["DataFrame"]
+          }
+        }
+      },
+      {
+        "id": "pareto-nsga3",
+        "type": "genericNode",
+        "position": { "x": 1000, "y": 200 },
+        "data": {
+          "type": "genericNode",
+          "node": {
+            "template": {
+              "resultados_simulaciones": { "type": "DataFrameInput", "value": null },
+              "objetivos": { "type": "StrInput", "value": "rendimiento_ton_ha,uso_agua_m3_ha,lixiviacion_N_kg_ha,margen_economico_usd_ha" },
+              "num_generaciones": { "type": "IntInput", "value": 100 },
+              "tamano_poblacion": { "type": "IntInput", "value": 100 },
+              "tipo": { "type": "str", "value": "GDAOptimizarParetoNSGAIII" }
+            },
+            "type": "GDAOptimizarParetoNSGAIII",
+            "base_classes": ["DataFrame"]
+          }
+        }
+      },
+      {
+        "id": "sobol-sensibilidad",
+        "type": "genericNode",
+        "position": { "x": 1000, "y": 430 },
+        "data": {
+          "type": "genericNode",
+          "node": {
+            "template": {
+              "datos": { "type": "DataFrameInput", "value": null },
+              "variable_objetivo": { "type": "DropdownInput", "value": "rendimiento_ton_ha" },
+              "variables": { "type": "StrInput", "value": "" },
+              "num_muestras": { "type": "IntInput", "value": 4096 },
+              "tipo": { "type": "str", "value": "GDAAnalisisSensibilidadSobol" }
+            },
+            "type": "GDAAnalisisSensibilidadSobol",
+            "base_classes": ["DataFrame", "MessageText"]
+          }
+        }
+      },
+      {
+        "id": "generar-reporte",
+        "type": "genericNode",
+        "position": { "x": 1320, "y": 200 },
+        "data": {
+          "type": "genericNode",
+          "node": {
+            "template": {
+              "datos": { "type": "DataFrameInput", "value": null },
+              "datos_secundarios": { "type": "DataFrameInput", "value": null },
+              "tipo_informe": { "type": "DropdownInput", "value": "simulaciones" },
+              "titulo": { "type": "StrInput", "value": "Optimización multiobjetivo de manejo de maíz" },
+              "guardar": { "type": "BoolInput", "value": true },
+              "tipo": { "type": "str", "value": "GDAGenerarReporte" }
+            },
+            "type": "GDAGenerarReporte",
+            "base_classes": ["MessageText"]
+          }
+        }
+      },
+      {
+        "id": "mostrar-pareto",
+        "type": "genericNode",
+        "position": { "x": 1320, "y": 430 },
+        "data": {
+          "type": "genericNode",
+          "node": {
+            "template": {
+              "dataframe": { "type": "DataFrameInput", "value": null },
+              "max_filas": { "type": "IntInput", "value": 25 },
+              "tipo": { "type": "str", "value": "GDAMostrarDataFrame" }
+            },
+            "type": "GDAMostrarDataFrame",
+            "base_classes": ["DataFrame", "MessageText"]
+          }
+        }
+      }
+    ],
+    "edges": [
+      {
+        "id": "e1",
+        "source": "panel-control",
+        "target": "disenar-escenarios",
+        "sourceHandle": { "field_name": "configuracion", "type": "DataFrame" },
+        "targetHandle": { "field_name": "n_escenarios", "type": "int" }
+      },
+      {
+        "id": "e2",
+        "source": "disenar-escenarios",
+        "target": "lote-simulaciones",
+        "sourceHandle": { "field_name": "escenarios", "type": "DataFrame" },
+        "targetHandle": { "field_name": "escenarios", "type": "DataFrame" }
+      },
+      {
+        "id": "e3",
+        "source": "lote-simulaciones",
+        "target": "pareto-nsga3",
+        "sourceHandle": { "field_name": "resultados", "type": "DataFrame" },
+        "targetHandle": { "field_name": "resultados_simulaciones", "type": "DataFrame" }
+      },
+      {
+        "id": "e4",
+        "source": "lote-simulaciones",
+        "target": "sobol-sensibilidad",
+        "sourceHandle": { "field_name": "resultados", "type": "DataFrame" },
+        "targetHandle": { "field_name": "datos", "type": "DataFrame" }
+      },
+      {
+        "id": "e5",
+        "source": "pareto-nsga3",
+        "target": "generar-reporte",
+        "sourceHandle": { "field_name": "frente_pareto", "type": "DataFrame" },
+        "targetHandle": { "field_name": "datos", "type": "DataFrame" }
+      },
+      {
+        "id": "e6",
+        "source": "pareto-nsga3",
+        "target": "mostrar-pareto",
+        "sourceHandle": { "field_name": "frente_pareto", "type": "DataFrame" },
+        "targetHandle": { "field_name": "dataframe", "type": "DataFrame" }
+      },
+      {
+        "id": "e7",
+        "source": "sobol-sensibilidad",
+        "target": "mostrar-pareto",
+        "sourceHandle": { "field_name": "indices", "type": "DataFrame" },
+        "targetHandle": { "field_name": "dataframe", "type": "DataFrame" }
+      }
+    ]
+  }
+}

@@ -414,3 +414,20 @@ async def estado_chatbot():
     except Exception as e:
         return {"estado": "error", "detalle": str(e)}
 
+
+# ---------------------------------------------------------------------------
+# Integración LangFlow: prototipado visual y exportación a LangGraph.
+# Se incluye como sub-router para no alterar los endpoints existentes.
+# ---------------------------------------------------------------------------
+try:
+    from .router_langflow import router as router_langflow
+
+    router.include_router(router_langflow)
+except ImportError:  # pragma: no cover - arranque como paquete o como script
+    try:
+        from router_langflow import router as router_langflow
+
+        router.include_router(router_langflow)
+    except ImportError as exc:
+        print(f"[GDA] Integración LangFlow no disponible: {exc}")
+

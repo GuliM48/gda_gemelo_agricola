@@ -3,6 +3,8 @@
 venv/
 .venv/
 env/
+.venv-langflow/
+
 
 # Python bytecode & cache
 __pycache__/

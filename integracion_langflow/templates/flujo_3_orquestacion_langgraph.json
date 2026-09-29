@@ -1,0 +1,133 @@
+{
+  "name": "GDA — Orquestación LangGraph (Réplica Visual)",
+  "description": "Réplica visual de los cuatro estados del agente LangGraph del GDA: Diseñar → Ejecutar → Analizar → Informar. Muestra cómo el prototipado en LangFlow se traduce a un grafo ejecutable en el backend.",
+  "tags": ["GDA", "LangGraph", "orquestación"],
+  "data": {
+    "nodes": [
+      {
+        "id": "estado-inicial",
+        "type": "genericNode",
+        "position": { "x": 100, "y": 320 },
+        "data": {
+          "type": "genericNode",
+          "node": {
+            "template": {
+              "region": { "type": "DropdownInput", "value": "CENTRO-OCCIDENTE" },
+              "objetivo": { "type": "DropdownInput", "value": "max_rendimiento_min_agua" },
+              "num_escenarios": { "type": "IntInput", "value": 8 },
+              "semilla": { "type": "IntInput", "value": 42 },
+              "tipo": { "type": "str", "value": "GDAPanelControlUsuario" }
+            },
+            "type": "GDAPanelControlUsuario",
+            "base_classes": ["DataFrame"]
+          }
+        }
+      },
+      {
+        "id": "nodo-disenar",
+        "type": "genericNode",
+        "position": { "x": 400, "y": 320 },
+        "data": {
+          "type": "genericNode",
+          "node": {
+            "template": {
+              "n_escenarios": { "type": "IntInput", "value": 8 },
+              "region": { "type": "DropdownInput", "value": "CENTRO-OCCIDENTE" },
+              "semilla": { "type": "IntInput", "value": 42 },
+              "tipo": { "type": "str", "value": "GDADisenarEscenariosLHS" }
+            },
+            "type": "GDADisenarEscenariosLHS",
+            "base_classes": ["DataFrame"]
+          }
+        }
+      },
+      {
+        "id": "nodo-ejecutar",
+        "type": "genericNode",
+        "position": { "x": 700, "y": 320 },
+        "data": {
+          "type": "genericNode",
+          "node": {
+            "template": {
+              "escenarios": { "type": "DataFrameInput", "value": null },
+              "region": { "type": "DropdownInput", "value": "CENTRO-OCCIDENTE" },
+              "num_dias": { "type": "IntInput", "value": 150 },
+              "filtrar_fallidos": { "type": "BoolInput", "value": true },
+              "tipo": { "type": "str", "value": "GDAEjecutarLoteSimulaciones" }
+            },
+            "type": "GDAEjecutarLoteSimulaciones",
+            "base_classes": ["DataFrame"]
+          }
+        }
+      },
+      {
+        "id": "nodo-analizar",
+        "type": "genericNode",
+        "position": { "x": 1000, "y": 320 },
+        "data": {
+          "type": "genericNode",
+          "node": {
+            "template": {
+              "datos": { "type": "DataFrameInput", "value": null },
+              "variable_objetivo": { "type": "DropdownInput", "value": "rendimiento_ton_ha" },
+              "variables": { "type": "StrInput", "value": "dosis_N,estrategia_riego,fecha_siembra_offset,densidad" },
+              "num_muestras": { "type": "IntInput", "value": 4096 },
+              "tipo": { "type": "str", "value": "GDAAnalisisSensibilidadSobol" }
+            },
+            "type": "GDAAnalisisSensibilidadSobol",
+            "base_classes": ["DataFrame", "MessageText"]
+          }
+        }
+      },
+      {
+        "id": "nodo-informar",
+        "type": "genericNode",
+        "position": { "x": 1300, "y": 320 },
+        "data": {
+          "type": "genericNode",
+          "node": {
+            "template": {
+              "datos": { "type": "DataFrameInput", "value": null },
+              "tipo_informe": { "type": "DropdownInput", "value": "simulaciones" },
+              "titulo": { "type": "StrInput", "value": "Informe de hallazgos — Orquestación LangGraph" },
+              "guardar": { "type": "BoolInput", "value": true },
+              "tipo": { "type": "str", "value": "GDAGenerarReporte" }
+            },
+            "type": "GDAGenerarReporte",
+            "base_classes": ["MessageText"]
+          }
+        }
+      }
+    ],
+    "edges": [
+      {
+        "id": "e1",
+        "source": "estado-inicial",
+        "target": "nodo-disenar",
+        "sourceHandle": { "field_name": "configuracion", "type": "DataFrame" },
+        "targetHandle": { "field_name": "n_escenarios", "type": "int" }
+      },
+      {
+        "id": "e2",
+        "source": "nodo-disenar",
+        "target": "nodo-ejecutar",
+        "sourceHandle": { "field_name": "escenarios", "type": "DataFrame" },
+        "targetHandle": { "field_name": "escenarios", "type": "DataFrame" }
+      },
+      {
+        "id": "e3",
+        "source": "nodo-ejecutar",
+        "target": "nodo-analizar",
+        "sourceHandle": { "field_name": "resultados", "type": "DataFrame" },
+        "targetHandle": { "field_name": "datos", "type": "DataFrame" }
+      },
+      {
+        "id": "e4",
+        "source": "nodo-analizar",
+        "target": "nodo-informar",
+        "sourceHandle": { "field_name": "indices", "type": "DataFrame" },
+        "targetHandle": { "field_name": "datos", "type": "DataFrame" }
+      }
+    ]
+  }
+}

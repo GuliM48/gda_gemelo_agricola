@@ -112,11 +112,17 @@ gda_gemelo_agricola/
 │   ├── database.py             # Conexión y consultas PostGIS
 │   ├── esquema.sql             # Esquema completo + datos demo
 │   └── carga_datos.py          # Ingesta automática y manual
+├── integracion_langflow/         # Capa low-code: componentes LangFlow + export a LangGraph
+│   ├── core/                     # Lógica sin dependencia de LangFlow (ABM, XGBoost, Pareto, Sobol)
+│   ├── components/               # 11 componentes visuales para LangFlow
+│   ├── templates/                # 3 flujos pre-diseñados importables
+│   └── flow_export.py            # Flujo LangFlow → código Python LangGraph
 ├── assets/
-│   ├── iconos/                 # Carpeta para iconos personalizados
-│   └── estilos.css             # Estilos UI personalizados
-├── requisitos.txt              # Dependencias Python
-└── README.md                   # Esta guía
+│   ├── iconos/                   # Carpeta para iconos personalizados
+│   └── estilos.css               # Estilos UI personalizados
+├── requisitos.txt                # Dependencias Python
+├── LANGFLOW.md                   # Instalación y uso de la integración low-code
+└── README.md                     # Esta guía
 ```
 
 ---

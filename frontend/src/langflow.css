@@ -1,0 +1,274 @@
+/* ──────────────────────────────────────────────────────────────
+   Integración LangFlow — modal del panel de control del GDA
+   ────────────────────────────────────────────────────────────── */
+
+.topbar-tag-langflow {
+  background: rgba(124, 58, 237, 0.18);
+  border: 1px solid rgba(167, 139, 250, 0.45);
+  color: #c4b5fd;
+  cursor: pointer;
+  font-family: inherit;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+
+.topbar-tag-langflow:hover {
+  background: rgba(139, 92, 246, 0.35);
+  color: #ede9fe;
+}
+
+.langflow-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(3, 7, 18, 0.78);
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 2rem;
+}
+
+.langflow-modal {
+  width: min(1200px, 100%);
+  height: min(860px, 100%);
+  display: flex;
+  flex-direction: column;
+  background: #0b1220;
+  border: 1px solid #1f3a5f;
+  border-radius: 14px;
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.55);
+  overflow: hidden;
+}
+
+.langflow-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.9rem 1.2rem;
+  background: linear-gradient(90deg, #0f1c33, #14263f);
+  border-bottom: 1px solid #1f3a5f;
+}
+
+.langflow-title {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.langflow-title h3 {
+  margin: 0;
+  font-size: 1rem;
+  color: #e6f0ff;
+}
+
+.langflow-title p {
+  margin: 0.15rem 0 0;
+  font-size: 0.75rem;
+  color: #8fa8c8;
+}
+
+.langflow-logo {
+  font-size: 1.6rem;
+}
+
+.langflow-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.lf-tab,
+.lf-close {
+  background: #16283f;
+  color: #b9cde6;
+  border: 1px solid #24466d;
+  border-radius: 8px;
+  padding: 0.35rem 0.75rem;
+  font-size: 0.78rem;
+  cursor: pointer;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+
+.lf-tab:hover {
+  background: #1d3557;
+  color: #fff;
+}
+
+.lf-tab.active {
+  background: #22c55e;
+  border-color: #22c55e;
+  color: #06210f;
+  font-weight: 600;
+}
+
+.lf-close {
+  margin-left: 0.4rem;
+  background: transparent;
+  border-color: #3b2020;
+  color: #f87171;
+}
+
+.langflow-error {
+  background: rgba(190, 40, 40, 0.2);
+  border-bottom: 1px solid #7f1d1d;
+  color: #fca5a5;
+  padding: 0.5rem 1.2rem;
+  font-size: 0.8rem;
+}
+
+.langflow-body {
+  flex: 1;
+  overflow: auto;
+  padding: 1.1rem 1.2rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.lf-embed {
+  padding: 0;
+}
+
+.lf-iframe {
+  flex: 1;
+  width: 100%;
+  border: 0;
+  background: #fff;
+}
+
+.lf-block {
+  background: #0f1c30;
+  border: 1px solid #1f3a5f;
+  border-radius: 10px;
+  padding: 0.9rem 1rem;
+}
+
+.lf-block h4 {
+  margin: 0 0 0.6rem;
+  font-size: 0.85rem;
+  color: #7dd3fc;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.lf-status {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 0.35rem;
+  font-size: 0.82rem;
+  color: #c6d6ea;
+}
+
+.lf-status li {
+  display: flex;
+  justify-content: space-between;
+  border-bottom: 1px dashed #1c3350;
+  padding-bottom: 0.3rem;
+}
+
+.lf-status .ok {
+  color: #4ade80;
+}
+
+.lf-status .warn {
+  color: #fbbf24;
+}
+
+.lf-select {
+  width: 100%;
+  background: #0a1524;
+  color: #dbeafe;
+  border: 1px solid #24466d;
+  border-radius: 8px;
+  padding: 0.45rem 0.6rem;
+  font-size: 0.82rem;
+}
+
+.lf-field {
+  display: block;
+  margin-top: 0.7rem;
+  font-size: 0.8rem;
+  color: #9db4d0;
+}
+
+.lf-field input[type='range'] {
+  width: 100%;
+  margin-top: 0.3rem;
+}
+
+.lf-row {
+  display: flex;
+  gap: 0.5rem;
+  margin-top: 0.8rem;
+  flex-wrap: wrap;
+}
+
+.lf-hint {
+  color: #8fa8c8;
+  font-size: 0.76rem;
+  margin: 0.4rem 0 0;
+}
+
+.lf-error {
+  color: #fca5a5;
+  font-size: 0.8rem;
+}
+
+.lf-progress {
+  height: 8px;
+  background: #0a1524;
+  border-radius: 999px;
+  overflow: hidden;
+  border: 1px solid #24466d;
+}
+
+.lf-progress div {
+  height: 100%;
+  background: linear-gradient(90deg, #22c55e, #38bdf8);
+  transition: width 0.3s ease;
+}
+
+.lf-code {
+  margin: 0.6rem 0 0;
+  background: #050b14;
+  border: 1px solid #1b3252;
+  border-radius: 8px;
+  padding: 0.7rem;
+  font-size: 0.72rem;
+  color: #a7f3d0;
+  max-height: 260px;
+  overflow: auto;
+  white-space: pre;
+}
+
+.lf-code-full {
+  max-height: none;
+}
+
+.lf-warn-list {
+  margin: 0.5rem 0 0;
+  padding-left: 1.1rem;
+  color: #fbbf24;
+  font-size: 0.78rem;
+}
+
+.lf-placeholder {
+  margin: auto;
+  text-align: center;
+  color: #9db4d0;
+  max-width: 640px;
+}
+
+.lf-placeholder pre {
+  background: #050b14;
+  border: 1px solid #1b3252;
+  border-radius: 8px;
+  padding: 0.6rem;
+  font-size: 0.75rem;
+  color: #7dd3fc;
+  text-align: left;
+  overflow-x: auto;
+}

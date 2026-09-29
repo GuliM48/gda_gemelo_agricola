@@ -1,0 +1,61 @@
+# LangFlow aislado para el Gemelo Digital Agrícola.
+#
+#   docker compose -f integracion_langflow/deploy/docker-compose.langflow.yml up -d
+#   docker compose -f integracion_langflow/deploy/docker-compose.langflow.yml logs -f
+#
+# El montaje de ./integracion_langflow hace visibles los componentes GDA
+# dentro del contenedor (LangFlow los descubre al arrancar).
+
+services:
+  langflow:
+    image: langflowai/langflow:latest
+    container_name: gda_langflow
+    restart: unless-stopped
+    ports:
+      - "${LANGFLOW_PORT:-7860}:7860"
+    environment:
+      LANGFLOW_HOST: 0.0.0.0
+      LANGFLOW_PORT: 7860
+      LANGFLOW_AUTO_LOGIN: "${LANGFLOW_AUTO_LOGIN:-false}"
+      LANGFLOW_SECRET_KEY: "${LANGFLOW_SECRET_KEY:?defina LANGFLOW_SECRET_KEY en .env}"
+      LANGFLOW_COMPONENTS_PATH: /app/integracion_langflow/components
+      # El contenedor no comparte la red del host salvo que se solicite.
+      GDA_API_BASE: "${GDA_API_BASE:-http://host.docker.internal:8000/api/v1}"
+      # Redis compartido con Celery.
+      REDIS_URL: "${REDIS_URL:-redis://redis:6379/0}"
+    volumes:
+      # Componentes GDA + código del proyecto (lectura de datos y artefactos).
+      - ../../integracion_langflow:/app/integracion_langflow:ro
+      - ../../data:/app/data:ro
+      - ../../results:/app/results:ro
+      - ../../modules:/app/modules:ro
+      - ../../configuracion.py:/app/configuracion.py:ro
+      # Persistencia de los flujos diseñados visualmente.
+      - langflow_data:/app/langflow
+    extra_hosts:
+      # Permite que el contenedor alcance el backend FastAPI en el host (Windows).
+      - "host.docker.internal:host-gateway"
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request;urllib.request.urlopen('http://localhost:7860/health')"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 40s
+
+  redis:
+    image: redis:7-alpine
+    container_name: gda_langflow_redis
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  langflow_data:
+  redis_data:

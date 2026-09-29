@@ -6,6 +6,8 @@ import { VisorGemeloDigital3D } from '../components/VisorGemeloDigital3D';
 import { PanelResultadosPareto } from '../components/PanelResultadosPareto';
 import { HistorialSimulaciones } from '../components/HistorialSimulaciones';
 import { ChatbotAsistente } from '../components/ChatbotAsistente';
+import { PanelLangFlow } from '../components/PanelLangFlow';
+import '../langflow.css';
 import { 
   apiFetch, 
   checkBackendOnline, 
@@ -20,6 +22,7 @@ export const GemeloDigital: React.FC = () => {
   const [activeTab, setActiveTab] = useState<TabId>('gemelo_3d');
   const [backendOnline, setBackendOnline] = useState<boolean>(false);
   const [sidebarCollapsed, setSidebarCollapsed] = useState<boolean>(false);
+  const [langflowAbierto, setLangflowAbierto] = useState<boolean>(false);
 
   // Estado de la simulación activa
   const [simulacionId, setSimulacionId] = useState<string | null>(null);
@@ -166,6 +169,13 @@ export const GemeloDigital: React.FC = () => {
                 🌾 Corriendo: <strong>{nombreSimulacion}</strong>
               </span>
             )}
+            <button
+              className="topbar-tag topbar-tag-langflow"
+              onClick={() => setLangflowAbierto(true)}
+              title="Diseñar flujos de agentes arrastrando y soltar, y exportarlos a LangGraph"
+            >
+              🎨 Abrir en LangFlow
+            </button>
           </div>
         </header>
 
@@ -254,6 +264,9 @@ export const GemeloDigital: React.FC = () => {
 
         {/* Asistente Agronómico Flotante con LangChain */}
         <ChatbotAsistente />
+
+        {/* Integración LangFlow: editor visual + exportación a LangGraph */}
+        <PanelLangFlow abierto={langflowAbierto} onCerrar={() => setLangflowAbierto(false)} />
       </div>
     </div>
   );

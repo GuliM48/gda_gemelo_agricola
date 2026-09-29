@@ -1,0 +1,107 @@
+{
+  "name": "GDA — Predicción Rápida de Rendimiento",
+  "description": "Carga el dataset maestro del GDA y predice el rendimiento de maíz con el modelo XGBoost campeón (R²=0.8447, RMSE=1.0153 ton/ha).",
+  "tags": ["GDA", "predicción", "XGBoost"],
+  "data": {
+    "nodes": [
+      {
+        "id": "cargar-datos",
+        "type": "genericNode",
+        "position": { "x": 120, "y": 220 },
+        "data": {
+          "type": "genericNode",
+          "node": {
+            "template": {
+              "origen": { "type": "DropdownInput", "value": "dataset_maestro" },
+              "region": { "type": "DropdownInput", "value": "TODAS" },
+              "n_registros": { "type": "IntInput", "value": 0 },
+              "anio_min": { "type": "FloatInput", "value": 0.0 },
+              "anio_max": { "type": "FloatInput", "value": 0.0 },
+              "tipo": { "type": "str", "value": "GDACargarDatosCYBench" }
+            },
+            "type": "GDACargarDatosCYBench",
+            "base_classes": ["DataFrame"]
+          }
+        }
+      },
+      {
+        "id": "prediccion-xgboost",
+        "type": "genericNode",
+        "position": { "x": 460, "y": 220 },
+        "data": {
+          "type": "genericNode",
+          "node": {
+            "template": {
+              "datos_entrada": { "type": "DataFrameInput", "value": null },
+              "ruta_modelo": { "type": "StrInput", "value": "" },
+              "ruta_preprocesador": { "type": "StrInput", "value": "" },
+              "incluir_intervalo": { "type": "BoolInput", "value": true },
+              "tipo": { "type": "str", "value": "GDAPrediccionXGBoost" }
+            },
+            "type": "GDAPrediccionXGBoost",
+            "base_classes": ["DataFrame", "MessageText"]
+          }
+        }
+      },
+      {
+        "id": "mostrar-resultados",
+        "type": "genericNode",
+        "position": { "x": 800, "y": 220 },
+        "data": {
+          "type": "genericNode",
+          "node": {
+            "template": {
+              "dataframe": { "type": "DataFrameInput", "value": null },
+              "max_filas": { "type": "IntInput", "value": 25 },
+              "tipo": { "type": "str", "value": "GDAMostrarDataFrame" }
+            },
+            "type": "GDAMostrarDataFrame",
+            "base_classes": ["DataFrame", "MessageText"]
+          }
+        }
+      },
+      {
+        "id": "generar-reporte",
+        "type": "genericNode",
+        "position": { "x": 1140, "y": 220 },
+        "data": {
+          "type": "genericNode",
+          "node": {
+            "template": {
+              "datos": { "type": "DataFrameInput", "value": null },
+              "tipo_informe": { "type": "DropdownInput", "value": "prediccion" },
+              "titulo": { "type": "StrInput", "value": "Predicción de rendimiento de maíz" },
+              "guardar": { "type": "BoolInput", "value": true },
+              "tipo": { "type": "str", "value": "GDAGenerarReporte" }
+            },
+            "type": "GDAGenerarReporte",
+            "base_classes": ["MessageText"]
+          }
+        }
+      }
+    ],
+    "edges": [
+      {
+        "id": "e1",
+        "source": "cargar-datos",
+        "target": "prediccion-xgboost",
+        "sourceHandle": { "field_name": "dataframe", "type": "DataFrame" },
+        "targetHandle": { "field_name": "datos_entrada", "type": "DataFrame" }
+      },
+      {
+        "id": "e2",
+        "source": "prediccion-xgboost",
+        "target": "mostrar-resultados",
+        "sourceHandle": { "field_name": "predicciones", "type": "DataFrame" },
+        "targetHandle": { "field_name": "dataframe", "type": "DataFrame" }
+      },
+      {
+        "id": "e3",
+        "source": "mostrar-resultados",
+        "target": "generar-reporte",
+        "sourceHandle": { "field_name": "dataframe", "type": "DataFrame" },
+        "targetHandle": { "field_name": "datos", "type": "DataFrame" }
+      }
+    ]
+  }
+}

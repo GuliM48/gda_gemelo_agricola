@@ -1,0 +1,15 @@
+# langflow>=1.0
+# Requisitos adicionales de la interfaz visual de LangFlow para el GDA.
+#
+# El motor del GDA (integracion_langflow/core) NO necesita LangFlow: solo lo
+# necesita el editor visual. Instale estas dependencias en un entorno aparte
+# si no desea mezclar el stack low-code con el entorno de simulación.
+
+langflow>=1.0
+langchain>=1.4.0
+langchain-community>=0.4.0
+langgraph>=1.0.0
+pydantic>=2.9
+python-dotenv>=1.0.1
+# El resto de las dependencias (pandas, numpy, mesa, pymoo, SALib, xgboost,
+# joblib, requests) ya están en requisitos_orquestador.txt.
