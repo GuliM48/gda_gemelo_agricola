@@ -4,7 +4,7 @@ Flujo exportado desde LangFlow: GDA — Orquestación LangGraph (Réplica Visual
 Réplica visual de los cuatro estados del agente LangGraph del GDA: Diseñar → Ejecutar → Analizar → Informar. Muestra cómo el prototipado en LangFlow se traduce a un grafo ejecutable en el backend.
 
 Generado automáticamente por integracion_langflow.flow_export.
-Fecha de exportación: 2026-09-29 11:15
+Fecha de exportación: 2026-09-29 11:18
 
 NO EDITAR A MANO: los cambios se pierden al reexportar el flujo.
 El flujo visual de LangFlow es la fuente de verdad; este archivo es el artefacto de producción.
