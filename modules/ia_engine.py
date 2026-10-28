@@ -31,6 +31,12 @@ from scipy import stats
 
 from config.i18n import t
 from config.settings import RANDOM_STATE, TEST_SIZE
+from modules.ia_report_generator import (
+    generar_reporte_ia_pdf,
+    generar_reporte_ia_word,
+    generar_reporte_ia_excel,
+    recopilar_datos_reporte_ia
+)
 
 # ══════════════════════════════════════════════════════════════════
 # RUTAS DE ARCHIVOS DEL DATASET REAL Y RESULTADOS DEL PIPELINE
@@ -748,6 +754,28 @@ def render_tab_4_seleccion_mejor(df):
             explicabilidad="Validación de robustez sin colinealidad: Las variables climáticas acumuladas (`rainfall_mm`, `temperature_mean_c`), edáficas (`clay_pct`, `soil_ph`) y de manejo (`nitrogen_kg_ha`) encabezan el ranking, confirmando que la predicción no depende de variables espurias."
         )
 
+    st.markdown("---")
+    st.markdown("#### 📑 Exportación Rápida de Informe del Modelo Campeón")
+    st.info("💡 **Reportes Técnicos del Motor IA:** Puedes generar y descargar el informe técnico completo en formato **PDF**, **Word** o **Excel** directamente desde la pestaña **'8. Generación de Reportes IA'** o descargar una copia inmediata con la configuración óptima:")
+
+    col_q1, col_q2, col_q3 = st.columns(3)
+    secc_def = {"comparativa_modelos": True, "test_ciego": True, "explicabilidad": True, "pruebas_estadisticas": True, "pareto_gemelo": True}
+    with col_q1:
+        if st.button("📄 Generar Ficha Técnica (PDF)", key="btn_quick_pdf_tab4", use_container_width=True):
+            with st.spinner("Compilando PDF con ReportLab..."):
+                pdf_b = generar_reporte_ia_pdf("Ficha Técnica Modelo Campeón XGBoost — GDA", "Agrónomo / Investigador", "GDA Gemelo Agrícola", "Evaluación test ciego N=752.", secc_def)
+                st.download_button("⬇️ Descargar Ficha PDF", pdf_b, file_name="Ficha_Tecnica_XGBoost_GDA.pdf", mime="application/pdf", key="dl_quick_pdf_tab4", use_container_width=True)
+    with col_q2:
+        if st.button("📝 Generar Informe Word (.docx)", key="btn_quick_word_tab4", use_container_width=True):
+            with st.spinner("Compilando Word con python-docx..."):
+                docx_b = generar_reporte_ia_word("Ficha Técnica Modelo Campeón XGBoost — GDA", "Agrónomo / Investigador", "GDA Gemelo Agrícola", "Evaluación test ciego N=752.", secc_def)
+                st.download_button("⬇️ Descargar Ficha Word", docx_b, file_name="Ficha_Tecnica_XGBoost_GDA.docx", mime="application/vnd.openxmlformats-officedocument.wordprocessingml.document", key="dl_quick_word_tab4", use_container_width=True)
+    with col_q3:
+        if st.button("📊 Generar Tablas Excel (.xlsx)", key="btn_quick_excel_tab4", use_container_width=True):
+            with st.spinner("Compilando Excel con openpyxl..."):
+                xlsx_b = generar_reporte_ia_excel(secc_def)
+                st.download_button("⬇️ Descargar Excel Métricas", xlsx_b, file_name="Metricas_Motor_IA_GDA.xlsx", mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", key="dl_quick_excel_tab4", use_container_width=True)
+
 # ══════════════════════════════════════════════════════════════════
 # 5. VALIDACIÓN CRUZADA ESPACIAL (5 FOLDS × 5 MODELOS)
 # ══════════════════════════════════════════════════════════════════
@@ -1032,6 +1060,145 @@ def render_tab_7_pruebas_robustas(df):
     )
 
 # ══════════════════════════════════════════════════════════════════
+# 8. GENERACIÓN DE REPORTES TÉCNICOS Y EXPORTACIÓN MULTIFORMATO
+# ══════════════════════════════════════════════════════════════════
+
+def render_tab_8_reportes_ia(df):
+    st.subheader("📑 8. Generación de Reportes Técnicos y Exportación Multiformato")
+    st.markdown(
+        """
+        Genera informes técnicos y científicos de alta fidelidad basados en los resultados reales 
+        del **Dataset Maestro de Maíz ($N = 5,009$)**, los 5 algoritmos de Machine Learning evaluados con 5-Fold CV, 
+        las métricas de prueba en test ciego ($N = 752$), la explicabilidad **SHAP**, las pruebas estadísticas robustas 
+        y la optimización multiobjetivo de **Pareto (NSGA-II / NSGA-III)**.
+        """
+    )
+
+    datos = recopilar_datos_reporte_ia()
+
+    # Panel de configuración del reporte
+    with st.container():
+        st.markdown("#### ⚙️ Configuración del Informe Técnico")
+        col_c1, col_c2 = st.columns(2)
+        with col_c1:
+            titulo_rep = st.text_input(
+                "Título del Documento",
+                value="Informe Técnico de Validación y Modelado del Motor de IA — GDA",
+                key="rep_titulo"
+            )
+            autor_rep = st.text_input(
+                "Autor / Especialista",
+                value="Ing. Agrónomo / Científico de Datos",
+                key="rep_autor"
+            )
+        with col_c2:
+            institucion_rep = st.text_input(
+                "Institución / Proyecto",
+                value="Gemelo de Decisión Agronómica (GDA) — Tesis de Investigación",
+                key="rep_institucion"
+            )
+            formato_rep = st.selectbox(
+                "Formato Principal de Descarga",
+                ["📄 PDF Científico Formal", "📝 Word (.docx) Estructurado", "📊 Excel Multitab (.xlsx)", "📦 Todos los Formatos"],
+                key="rep_formato"
+            )
+
+        observaciones_rep = st.text_area(
+            "Notas Técnicas u Observaciones Agronómicas Adicionales (Opcional)",
+            value="El modelo campeón XGBoost Regressor presenta alta fidelidad en generalización out-of-sample (R² = 0.8447, RMSE = 1.0153 ton/ha). Se recomienda calibrar láminas de riego deficitario controlado en zonas con precipitación menor a 450 mm.",
+            key="rep_observaciones",
+            height=85
+        )
+
+        st.markdown("##### 📌 Secciones a Incluir en el Informe")
+        c_sec1, c_sec2, c_sec3 = st.columns(3)
+        with c_sec1:
+            inc_comp = st.checkbox("1. Comparativa de Modelos (5 Algoritmos)", value=True, key="sec_comp")
+            inc_test = st.checkbox("2. Test Ciego Out-of-Sample (N = 752)", value=True, key="sec_test")
+        with c_sec2:
+            inc_shap = st.checkbox("3. Explicabilidad Global SHAP & Permutación", value=True, key="sec_shap")
+            inc_stats = st.checkbox("4. Pruebas Robustas (Friedman, Bootstrap)", value=True, key="sec_stats")
+        with c_sec3:
+            inc_pareto = st.checkbox("5. Pareto Multiobjetivo y Gemelo Digital", value=True, key="sec_pareto")
+
+    secciones_map = {
+        "comparativa_modelos": inc_comp,
+        "test_ciego": inc_test,
+        "explicabilidad": inc_shap,
+        "pruebas_estadisticas": inc_stats,
+        "pareto_gemelo": inc_pareto
+    }
+
+    st.markdown("---")
+
+    # Botón de Generación y Botones de Descarga
+    col_gen, col_info = st.columns([1, 2])
+    with col_gen:
+        btn_generar = st.button("📥 Generar Archivos de Reporte", type="primary", use_container_width=True)
+
+    if btn_generar or st.session_state.get("reporte_ia_generado", False):
+        st.session_state["reporte_ia_generado"] = True
+
+        with st.spinner("Generando documentos técnicos con tablas, gráficos y métricas formales..."):
+            pdf_bytes = generar_reporte_ia_pdf(
+                titulo_rep, autor_rep, institucion_rep, observaciones_rep, secciones_map
+            )
+            docx_bytes = generar_reporte_ia_word(
+                titulo_rep, autor_rep, institucion_rep, observaciones_rep, secciones_map
+            )
+            excel_bytes = generar_reporte_ia_excel(secciones_map)
+
+        st.success("✅ **Reportes técnicos generados exitosamente.** Puedes descargar el formato de tu preferencia:")
+
+        # Tarjetas de descarga
+        cd1, cd2, cd3 = st.columns(3)
+        nombre_base = "Informe_Tecnico_Motor_IA_GDA"
+
+        with cd1:
+            st.download_button(
+                label="📄 Descargar PDF Científico",
+                data=pdf_bytes,
+                file_name=f"{nombre_base}.pdf",
+                mime="application/pdf",
+                use_container_width=True
+            )
+            st.caption("Documento formal con tablas numeradas, estilos tipográficos y diseño de publicación.")
+
+        with cd2:
+            st.download_button(
+                label="📝 Descargar Word (.docx)",
+                data=docx_bytes,
+                file_name=f"{nombre_base}.docx",
+                mime="application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+                use_container_width=True
+            )
+            st.caption("Documento editable en Microsoft Word con formato corporativo y tablas estilizadas.")
+
+        with cd3:
+            st.download_button(
+                label="📊 Descargar Excel (.xlsx)",
+                data=excel_bytes,
+                file_name=f"{nombre_base}.xlsx",
+                mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                use_container_width=True
+            )
+            st.caption("Libro con 6 hojas especializadas: Resumen, Modelos, Test, SHAP, Bootstrap y Pareto.")
+
+    # Vista previa estructurada
+    with st.expander("👁️ Vista Previa de los Datos Consolidados del Reporte", expanded=False):
+        st.markdown("##### Resumen Ejecutivo de Métricas Clave")
+        st.dataframe(datos["df_test_perf"], use_container_width=True)
+
+        if not datos["df_modelos_comp"].empty:
+            st.markdown("##### Comparativa de Modelos de Machine Learning")
+            st.dataframe(datos["df_modelos_comp"], use_container_width=True)
+
+        if not datos["df_shap_imp"].empty:
+            st.markdown("##### Top Factores Agronómicos según Valores SHAP")
+            st.dataframe(datos["df_shap_imp"], use_container_width=True)
+
+
+# ══════════════════════════════════════════════════════════════════
 # PUNTO DE ENTRADA PRINCIPAL DEL MOTOR DE IA
 # ══════════════════════════════════════════════════════════════════
 
@@ -1041,15 +1208,16 @@ def interfaz_motor_ia():
 
     df = obtener_o_inicializar_dataframe()
 
-    # 7 PESTAÑAS SECUENCIALES LIMPIAS CON RESULTADOS REALES
-    tab1, tab2, tab3, tab4, tab5, tab6, tab7 = st.tabs([
+    # 8 PESTAÑAS SECUENCIALES LIMPIAS CON RESULTADOS REALES Y REPORTES
+    tab1, tab2, tab3, tab4, tab5, tab6, tab7, tab8 = st.tabs([
         "📐 1. CRISP-DM & Homologación",
         "📊 2. EDA Dataset Real (5,009)",
         "🏋️ 3. Entrenamiento (5 Modelos CV)",
         "🏆 4. Modelo Campeón (Test Ciego)",
         "🗺️ 5. Validación Cruzada (Folds)",
         "⚙️ 6. Hiperparámetros Óptimos",
-        "🧪 7. Pruebas Robustas & Pareto"
+        "🧪 7. Pruebas Robustas & Pareto",
+        "📑 8. Generación de Reportes IA"
     ])
 
     with tab1:
@@ -1066,3 +1234,6 @@ def interfaz_motor_ia():
         render_tab_6_hiperparametros(df)
     with tab7:
         render_tab_7_pruebas_robustas(df)
+    with tab8:
+        render_tab_8_reportes_ia(df)
+

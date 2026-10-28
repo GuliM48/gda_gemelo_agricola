@@ -4,7 +4,7 @@ Flujo exportado desde LangFlow: GDA — Predicción Rápida de Rendimiento
 Carga el dataset maestro del GDA y predice el rendimiento de maíz con el modelo XGBoost campeón (R²=0.8447, RMSE=1.0153 ton/ha).
 
 Generado automáticamente por integracion_langflow.flow_export.
-Fecha de exportación: 2026-09-29 11:16
+Fecha de exportación: 2026-10-14 00:00
 
 NO EDITAR A MANO: los cambios se pierden al reexportar el flujo.
 El flujo visual de LangFlow es la fuente de verdad; este archivo es el artefacto de producción.

@@ -4,7 +4,7 @@ Flujo exportado desde LangFlow: GDA — Optimización Completa (ABM + Pareto + S
 Diseño experimental por hipercubo latino, lote de simulaciones del gemelo ABM (Mesa + FAO-56), optimización multiobjetivo NSGA-III y análisis de sensibilidad global de Sobol.
 
 Generado automáticamente por integracion_langflow.flow_export.
-Fecha de exportación: 2026-09-29 11:17
+Fecha de exportación: 2026-09-29 19:01
 
 NO EDITAR A MANO: los cambios se pierden al reexportar el flujo.
 El flujo visual de LangFlow es la fuente de verdad; este archivo es el artefacto de producción.
