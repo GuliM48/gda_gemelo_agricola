@@ -461,8 +461,7 @@ def interfaz_gemelo():
             bgcolor="rgba(15, 23, 42, 0.92)",
             bordercolor="rgba(255, 255, 255, 0.18)",
             borderwidth=1,
-            font=dict(size=11, color="#f1f5f9"),
-            itemgap=18
+            font=dict(size=11, color="#f1f5f9")
         ),
         margin=dict(l=25, r=95, b=85, t=40)
     )

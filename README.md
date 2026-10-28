@@ -3,6 +3,8 @@
 > **Gemelo Digital 3D de Campos Agrícolas con IA**  
 > Simulación basada en agentes (Mesa) + Alerta Temprana con umbral ≥70% + Visualización 3D + Modelado Predictivo
 
+> **Guía breve para presentar el sistema:** [docs/GUIA_SISTEMA_GDA.md](docs/GUIA_SISTEMA_GDA.md)
+
 ---
 
 ## ✅ Características Principales

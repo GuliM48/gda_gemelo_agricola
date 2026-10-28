@@ -32,80 +32,88 @@ ESTRES_COLOR = "#E53935"
 
 
 def figura_1_arquitectura(grafo_info: Optional[dict] = None) -> str:
-    """Figura 1: Diagrama de arquitectura del sistema."""
-    fig, ax = plt.subplots(figsize=(12, 8))
-    ax.set_xlim(0, 10)
-    ax.set_ylim(0, 10)
+    """Figure 1: separate Streamlit and React/FastAPI access paths."""
+    fig, ax = plt.subplots(figsize=(13, 7))
+    ax.set_xlim(0, 13)
+    ax.set_ylim(0, 7)
     ax.axis("off")
+    ax.set_title("Agricultural decision-support system architecture", fontsize=14, fontweight="bold", pad=18)
 
-    ax.text(5, 9.5, "Arquitectura del Sistema", ha="center", fontsize=16, fontweight="bold")
-
-    cajas = [
-        (5, 8.0, "Usuario", "Objetivo:\nmax_rendimiento\nmin_agua", "#4CAF50"),
-        (5, 6.5, "LangGraph\nOrquestador", "Diseñar → Ejecutar → Analizar → Informar", "#2196F3"),
-        (2, 4.5, "Diseño\nExperimental", "LHS\n5 variables", "#FF9800"),
-        (5, 4.5, "Ejecución\nABM (Mesa)", "GemeloMaiz\n× N escenarios", "#9C27B0"),
-        (8, 4.5, "Análisis\n& Pareto", "Sobol + NSGA-III", "#F44336"),
-        (5, 2.5, "Gemelo\nDigital", "Datos CY-Bench\n+ Validación", "#607D8B"),
-        (5, 1.0, "Salida", "Reporte + Frentes\n+ Figuras", "#795548"),
+    boxes = [
+        (0.5, 5.0, 3.6, 1.15, "Streamlit interface · :8501", "AI engine, data analysis, digital-twin views", "#2E7D32"),
+        (8.9, 5.0, 3.6, 1.15, "React frontend · :8000", "Frontend build served by FastAPI", "#1565C0"),
+        (0.5, 2.9, 3.6, 1.15, "Streamlit application", "Prediction, model evaluation, reports", "#558B2F"),
+        (5.0, 2.9, 3.0, 1.15, "FastAPI REST API", "Simulation and orchestration endpoints", "#1976D2"),
+        (9.0, 2.9, 3.5, 1.15, "LangGraph workflow", "Design → execute → analyze → report", "#EF6C00"),
+        (5.0, 0.65, 3.0, 1.15, "Agronomic simulation", "Agent-based model and scenario outputs", "#6A1B9A"),
+        (9.0, 0.65, 3.5, 1.15, "Optimization and analysis", "Sensitivity, Pareto alternatives, summaries", "#C62828"),
     ]
 
-    for x, y, titulo, desc, color in cajas:
-        rect = mpatches.FancyBboxPatch((x - 1.2, y - 0.6), 2.4, 1.0,
-                                        boxstyle="round,pad=0.05",
-                                        facecolor=color, alpha=0.3,
-                                        edgecolor=color, linewidth=2)
+    for x, y, width, height, title, detail, color in boxes:
+        rect = mpatches.FancyBboxPatch(
+            (x, y), width, height, boxstyle="round,pad=0.08",
+            facecolor=color, alpha=0.12, edgecolor=color, linewidth=1.8,
+        )
         ax.add_patch(rect)
-        ax.text(x, y + 0.15, titulo, ha="center", va="center", fontsize=9, fontweight="bold")
-        ax.text(x, y - 0.2, desc, ha="center", va="center", fontsize=7, alpha=0.8)
+        ax.text(x + width / 2, y + 0.72, title, ha="center", va="center", fontsize=9, fontweight="bold")
+        ax.text(x + width / 2, y + 0.32, detail, ha="center", va="center", fontsize=7.5, wrap=True)
 
-    flechas = [(5, 7.7, 5, 7.0), (5, 5.9, 2.2, 5.1), (5, 5.9, 5, 5.1),
-               (5, 5.9, 7.8, 5.1), (2, 3.9, 5, 3.1), (8, 3.9, 5, 3.1),
-               (5, 1.9, 5, 1.6)]
-    for x1, y1, x2, y2 in flechas:
-        ax.annotate("", xy=(x2, y2), xytext=(x1, y1),
-                    arrowprops=dict(arrowstyle="->", color="black", lw=1.5))
+    arrows = [
+        ((2.3, 5.0), (2.3, 4.1)),
+        ((10.7, 5.0), (6.5, 4.1)),
+        ((8.0, 3.48), (9.0, 3.48)),
+        ((10.7, 2.9), (6.5, 1.8)),
+        ((8.0, 1.22), (9.0, 1.22)),
+    ]
+    for start, end in arrows:
+        ax.annotate("", xy=end, xytext=start,
+                    arrowprops=dict(arrowstyle="->", color="#37474F", lw=1.5))
 
+    ax.text(6.5, 6.45, "Two application entry points; the React frontend is served by the FastAPI service",
+            ha="center", fontsize=8, color="#455A64")
     fig_path = os.path.join(FIGURAS_DIR, "figura_1_arquitectura.png")
     fig.savefig(fig_path, dpi=300, bbox_inches="tight")
     plt.close(fig)
     return fig_path
 
 
-def figura_2_mapa_regiones() -> str:
-    """Figura 2: Mapa de México con las 3 regiones de estudio."""
-    fig, ax = plt.subplots(figsize=(10, 8))
+def figura_2_mapa_regiones(datos: Optional[pd.DataFrame] = None) -> str:
+    """Figure 2: plot only records with observed geographic coordinates."""
+    if datos is None:
+        ruta_datos = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(__file__)))),
+                                  "data", "data_clean.csv")
+        datos = pd.read_csv(ruta_datos)
 
-    regiones = {
-        "NOROESTE": {"color": "#1565C0", "estados": ["Sinaloa", "Sonora"]},
-        "CENTRO-OCCIDENTE": {"color": "#2E7D32", "estados": ["Jalisco", "Guanajuato"]},
-        "SURESTE": {"color": "#E53935", "estados": ["Chiapas", "Tabasco"]},
-    }
+    requeridas = {"latitude", "longitude", "source_dataset"}
+    if not requeridas.issubset(datos.columns):
+        raise ValueError(f"El mapa requiere las columnas: {', '.join(sorted(requeridas))}")
 
-    coords = {
-        "Sinaloa": (24.8, -107.3), "Sonora": (29.0, -111.0),
-        "Jalisco": (20.7, -103.3), "Guanajuato": (20.6, -101.5),
-        "Chiapas": (16.7, -92.6), "Tabasco": (17.8, -92.0),
-    }
+    georreferenciados = datos.dropna(subset=["latitude", "longitude"]).copy()
+    if georreferenciados.empty:
+        raise ValueError("No hay registros con coordenadas para generar el mapa")
 
-    for reg, info in regiones.items():
-        for estado in info["estados"]:
-            if estado in coords:
-                x, y = coords[estado]
-                ax.scatter(x, y, s=300, c=info["color"], zorder=5, edgecolors="black", linewidth=1.5)
-                ax.annotate(f"{estado}\n{reg}", (x, y), textcoords="offset points",
-                            xytext=(10, 10), fontsize=8, color=info["color"], fontweight="bold")
+    fuentes = sorted(georreferenciados["source_dataset"].unique())
+    paleta = sns.color_palette("colorblind", n_colors=len(fuentes))
+    colores = dict(zip(fuentes, paleta))
+    fig, ax = plt.subplots(figsize=(9, 6))
 
-    ax.set_xlim(-115, -88)
-    ax.set_ylim(14, 32)
-    ax.set_xlabel("Longitud Oeste")
-    ax.set_ylabel("Latitud Norte")
-    ax.set_title("Regiones de Estudio — CY-Bench México", fontweight="bold")
+    for fuente in fuentes:
+        subset = georreferenciados[georreferenciados["source_dataset"] == fuente]
+        ax.scatter(subset["longitude"], subset["latitude"], s=9, alpha=0.28,
+                   color=colores[fuente], label=f"{fuente.replace('_', ' ')} (n={len(subset):,})",
+                   edgecolors="none", rasterized=True)
+        ax.scatter(subset["longitude"].median(), subset["latitude"].median(), s=45,
+                   color=colores[fuente], edgecolors="black", linewidth=0.6, zorder=3)
 
-    legend_patches = [mpatches.Patch(color=r["color"], label=r) for r in regiones.values()]
-    ax.legend(handles=legend_patches, loc="lower left")
-
-    ax.grid(True, alpha=0.3)
+    ax.set_xlabel("Longitude (degrees)")
+    ax.set_ylabel("Latitude (degrees)")
+    ax.set_title("Georeferenced experimental records in the cleaned dataset", fontweight="bold")
+    ax.grid(True, alpha=0.25)
+    ax.legend(title="Source (georeferenced records)", fontsize=7, loc="best", frameon=True)
+    ax.text(0.01, -0.18,
+            f"Coordinates available for {len(georreferenciados):,} of {len(datos):,} records; points show observed plot coordinates.",
+            transform=ax.transAxes, fontsize=7, color="#455A64")
+    fig.tight_layout()
 
     fig_path = os.path.join(FIGURAS_DIR, "figura_2_mapa_regiones.png")
     fig.savefig(fig_path, dpi=300, bbox_inches="tight")
@@ -114,31 +122,41 @@ def figura_2_mapa_regiones() -> str:
 
 
 def figura_3_validacion(resultados_simulados: pd.DataFrame, datos_historicos: pd.DataFrame) -> str:
-    """Figura 3: Validación del modelo ABM."""
-    fig, axes = plt.subplots(1, 2, figsize=(14, 5))
+    """Figure 3: compare yield distributions without implying paired observations."""
+    fig, axes = plt.subplots(1, 2, figsize=(12, 4.5))
+    simulados = resultados_simulados.get("rendimiento_ton_ha", pd.Series(dtype=float)).dropna().to_numpy()
+    observados = pd.Series(dtype=float)
+    if "yield_ton_ha" in datos_historicos.columns:
+        observados = datos_historicos["yield_ton_ha"].dropna()
+    elif "hg/ha_yield" in datos_historicos.columns:
+        observados = datos_historicos["hg/ha_yield"].dropna() / 10000
+    observados = observados.to_numpy()
 
-    if "rendimiento_ton_ha" in resultados_simulados.columns and len(resultados_simulados) > 0:
-        ax = axes[0]
-        simulados = resultados_simulados["rendimiento_ton_ha"].values
-        if len(datos_historicos) > 0 and "hg/ha_yield" in datos_historicos.columns:
-            observados = datos_historicos["hg/ha_yield"].values / 1000
-            n = min(len(simulados), len(observados))
-            ax.scatter(observados[:n], simulados[:n], alpha=0.6, c=SALUDO_COLOR, s=50)
-        else:
-            ax.hist(simulados, bins=15, color=SALUDO_COLOR, alpha=0.7, edgecolor="black")
-        ax.set_xlabel("Rendimiento Observado (ton/ha)")
-        ax.set_ylabel("Rendimiento Simulado (ton/ha)")
-        ax.set_title("Validación: Simulado vs Observado")
-        ax.plot([0, 12], [0, 12], "r--", alpha=0.5, label="1:1")
-        ax.legend()
+    if simulados.size:
+        axes[0].hist(simulados, bins=20, density=True, alpha=0.55, color=SALUDO_COLOR,
+                     label=f"Simulated (n={simulados.size:,})")
+    if observados.size:
+        axes[0].hist(observados, bins=20, density=True, alpha=0.45, color=RIEGO_COLOR,
+                     label=f"Observed (n={observados.size:,})")
+    axes[0].set_xlabel("Grain yield (t ha$^{-1}$)")
+    axes[0].set_ylabel("Density")
+    axes[0].set_title("Yield distributions")
+    axes[0].legend(frameon=False)
 
-    if "rendimiento_ton_ha" in resultados_simulados.columns:
-        ax = axes[1]
-        ax.boxplot([resultados_simulados["rendimiento_ton_ha"]], tick_labels=["Simulado"])
-        ax.set_title("Distribución de Rendimiento")
-        ax.set_ylabel("ton/ha")
+    for values, label, color in ((observados, "Observed", RIEGO_COLOR),
+                                 (simulados, "Simulated", SALUDO_COLOR)):
+        if values.size:
+            ordered = np.sort(values)
+            cumulative = np.arange(1, len(ordered) + 1) / len(ordered)
+            axes[1].step(ordered, cumulative, where="post", label=label, color=color, linewidth=1.8)
+    axes[1].set_xlabel("Grain yield (t ha$^{-1}$)")
+    axes[1].set_ylabel("Cumulative proportion")
+    axes[1].set_title("Empirical cumulative distributions")
+    axes[1].legend(frameon=False)
+    for ax in axes:
+        ax.grid(True, alpha=0.2)
 
-    plt.tight_layout()
+    fig.tight_layout()
     fig_path = os.path.join(FIGURAS_DIR, "figura_3_validacion.png")
     fig.savefig(fig_path, dpi=300, bbox_inches="tight")
     plt.close(fig)
@@ -180,45 +198,97 @@ def figura_4_flujo_langgraph() -> str:
     return fig_path
 
 
-def figura_5_sensibilidad(indices: dict) -> str:
-    """Figura 5: Índices de sensibilidad Sobol."""
-    if not indices:
-        return ""
+def figura_5_sensibilidad(resultados_sobol: pd.DataFrame) -> str:
+    """Figura 5: índices S1 y ST para los siete factores y tres salidas del gemelo."""
+    columnas = {
+        "Variable_Objetivo",
+        "Factor_Entrada",
+        "Sobol_S1_Primer_Orden",
+        "S1_Conf_95",
+        "Sobol_ST_Orden_Total",
+        "ST_Conf_95",
+    }
+    factores = [
+        "rainfall_mm",
+        "irrigation_mm",
+        "nitrogen_kg_ha",
+        "temperature_mean_c",
+        "radiation_mean",
+        "clay_pct",
+        "soil_organic_matter_pct",
+    ]
+    salidas = {
+        "yield_ton_ha": ("Rendimiento", "t/ha"),
+        "water_use_m3_ha": ("Uso de agua", "m³/ha"),
+        "nitrogen_leaching_kg_ha": ("Lixiviación de nitrógeno", "kg N/ha"),
+    }
+    etiquetas_factores = {
+        "rainfall_mm": "Precipitación",
+        "irrigation_mm": "Riego",
+        "nitrogen_kg_ha": "Nitrógeno",
+        "temperature_mean_c": "Temperatura\nmedia",
+        "radiation_mean": "Radiación\nsolar",
+        "clay_pct": "Arcilla",
+        "soil_organic_matter_pct": "Materia\norgánica",
+    }
+    faltantes = columnas.difference(resultados_sobol.columns)
+    if faltantes:
+        raise ValueError(f"El CSV de Sobol no contiene columnas requeridas: {', '.join(sorted(faltantes))}")
 
-    objetivos = list(indices.keys())[:4]
-    variables = list(indices[objetivos[0]].keys()) if objetivos else []
+    disponibles = set(resultados_sobol["Factor_Entrada"])
+    if disponibles != set(factores):
+        raise ValueError("El CSV de Sobol debe contener exactamente los siete factores de entrada definidos.")
+    if set(resultados_sobol["Variable_Objetivo"]) != set(salidas):
+        raise ValueError("El CSV de Sobol debe contener rendimiento, uso de agua y lixiviación.")
+    if resultados_sobol.duplicated(["Variable_Objetivo", "Factor_Entrada"]).any():
+        raise ValueError("El CSV de Sobol contiene factores duplicados para una salida.")
 
-    fig, axes = plt.subplots(1, min(len(objetivos), 4), figsize=(5 * len(objetivos), 4))
-    if len(objetivos) == 1:
-        axes = [axes]
+    fig, axes = plt.subplots(1, 3, figsize=(18, 6), sharey=True)
+    x = np.arange(len(factores))
+    width = 0.36
+    for ax, (salida, (titulo, unidad)) in zip(axes, salidas.items()):
+        datos = (
+            resultados_sobol[resultados_sobol["Variable_Objetivo"] == salida]
+            .set_index("Factor_Entrada")
+            .reindex(factores)
+        )
+        ax.bar(
+            x - width / 2,
+            datos["Sobol_S1_Primer_Orden"],
+            width,
+            yerr=datos["S1_Conf_95"],
+            label="Primer orden ($S_1$)",
+            color=RIEGO_COLOR,
+            capsize=2,
+        )
+        ax.bar(
+            x + width / 2,
+            datos["Sobol_ST_Orden_Total"],
+            width,
+            yerr=datos["ST_Conf_95"],
+            label="Orden total ($S_T$)",
+            color=ESTRES_COLOR,
+            capsize=2,
+        )
+        ax.set_title(f"{titulo}\n({unidad})")
+        ax.set_xticks(x)
+        ax.set_xticklabels([etiquetas_factores[factor] for factor in factores], fontsize=8)
+        ax.set_xlabel("Factor de entrada")
+        ax.grid(axis="y", alpha=0.25)
+        ax.set_axisbelow(True)
 
-    for idx, obj in enumerate(objetivos):
-        ax = axes[idx]
-        if "S1" in indices[obj]:
-            var_names = list(indices[obj]["S1"].keys())
-            s1_vals = list(indices[obj]["S1"].values())
-            st_vals = list(indices[obj]["ST"].values())
-            
-            x = np.arange(len(var_names))
-            ax.bar(x - 0.2, s1_vals, 0.4, label="S1 (1er orden)", color=RIEGO_COLOR, alpha=0.8)
-            ax.bar(x + 0.2, st_vals, 0.4, label="ST (total)", color=ESTRES_COLOR, alpha=0.8)
-            ax.set_xticks(x)
-            ax.set_xticklabels([v[:6] for v in var_names], rotation=45, fontsize=7)
-            ax.set_title(obj[:20])
-            ax.legend(fontsize=7)
-        else:
-            var_names = list(indices[obj].keys())
-            vals = list(indices[obj].values())
-            
-            x = np.arange(len(var_names))
-            ax.bar(x, vals, 0.5, label="Correlación", color=RIEGO_COLOR, alpha=0.8)
-            ax.set_xticks(x)
-            ax.set_xticklabels([v[:6] for v in var_names], rotation=45, fontsize=7)
-            ax.set_title(obj[:20])
-            ax.legend(fontsize=7)
-
-    plt.suptitle("Análisis de Sensibilidad Sobol", fontweight="bold")
-    plt.tight_layout()
+    axes[0].set_ylabel("Índice de Sobol")
+    fig.suptitle("Sensibilidad global del gemelo digital", fontweight="bold")
+    handles, labels = axes[0].get_legend_handles_labels()
+    fig.legend(handles, labels, loc="upper center", bbox_to_anchor=(0.5, 0.92), ncol=2, frameon=False)
+    fig.text(
+        0.5,
+        0.015,
+        "Barras de error: intervalos de confianza del 95% de los índices de Sobol.",
+        ha="center",
+        fontsize=9,
+    )
+    fig.tight_layout(rect=(0, 0.06, 1, 0.84))
     fig_path = os.path.join(FIGURAS_DIR, "figura_5_sensibilidad.png")
     fig.savefig(fig_path, dpi=300, bbox_inches="tight")
     plt.close(fig)
@@ -236,7 +306,7 @@ def figura_6_pareto_2d(resultados: pd.DataFrame, frente: pd.DataFrame, region: s
         )
 
     if len(frente) > 0 and "rendimiento_ton_ha" in frente.columns and "uso_agua_m3_ha" in frente.columns:
-        idx = np.argsort(frente["uso_agua_m3_ha"].values)
+        idx = np.argsort(np.asarray(frente["uso_agua_m3_ha"], dtype=float))
         frente_ordenado = frente.iloc[idx]
         ax.plot(
             frente_ordenado["uso_agua_m3_ha"], frente_ordenado["rendimiento_ton_ha"],
@@ -367,8 +437,8 @@ def figura_10_arbol_regresion(resultados: pd.DataFrame, variables: list, métric
     from sklearn.ensemble import RandomForestRegressor
 
     vars_disp = [v for v in variables if v in resultados.columns]
-    X = resultados[vars_disp].values
-    y = resultados[métrica].values
+    X = resultados[vars_disp].to_numpy(dtype=float)
+    y = np.asarray(resultados[métrica], dtype=float)
 
     rf = RandomForestRegressor(n_estimators=50, random_state=42, max_depth=4)
     rf.fit(X, y)

@@ -855,7 +855,6 @@ export const VisorGemeloDigital3D: React.FC<VisorGemeloDigital3DProps> = ({ zona
                   borderwidth: 1,
                   font: { size: 11, color: '#f1f5f9' },
                   itemsizing: 'constant',
-                  itemgap: 18,
                 },
                 modebar: {
                   orientation: 'h',

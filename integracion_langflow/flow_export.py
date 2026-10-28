@@ -245,7 +245,7 @@ def _emitir_datos(ctx: ContextoFlujo) -> NodoGenerado:
         f"    region = {region}",
         f"    max_registros = {n}",
         "    if origen.startswith('cybench'):",
-        "        import config as _cfg",
+        "        from integracion_langflow.core import config as _cfg",
         "        if region == 'TODAS':",
         "            raise ValueError('El generador CY-Bench requiere una región concreta')",
         "        _clave = {'cybench_cybench': 'yield', 'cybench_meteo': 'meteo', 'cybench_suelo': 'soil'}[origen]",
@@ -692,8 +692,9 @@ def flujo_a_codigo(flujo: Dict[str, Any], nombre_modulo: Optional[str] = None) -
     lineas = _encabezado(plan)
     lineas.append("")
     lineas.append("")
-    lineas.append("def _inicializar(estado: Dict[str, Any]) -> EstadoGDA:")
+    lineas.append("def _inicializar(state: Dict[str, Any]) -> EstadoGDA:")
     lineas.append('    """Punto de entrada del grafo: completa los parámetros de control."""')
+    lineas.append("    estado = state")
     lineas.append("    return {")
     for clave, defecto in ESTADO_VACIO.items():
         lineas.append(f"        {clave!r}: estado.get({clave!r}, {defecto!r}),")
@@ -704,8 +705,9 @@ def flujo_a_codigo(flujo: Dict[str, Any], nombre_modulo: Optional[str] = None) -
     for nodo in plan["nodos"]:
         lineas.append("")
         lineas.append("")
-        lineas.append(f"def {nodo.nombre_funcion}(estado: EstadoGDA) -> EstadoGDA:")
+        lineas.append(f"def {nodo.nombre_funcion}(state: EstadoGDA) -> EstadoGDA:")
         lineas.append(f'    """Nodo exportado: {nodo.nombre_visual} ({nodo.tipo})."""')
+        lineas.append("    estado = state")
         for advertencia in nodo.advertencias:
             lineas.append(f"    # ADVERTENCIA: {advertencia}")
         lineas.extend(nodo.cuerpo)

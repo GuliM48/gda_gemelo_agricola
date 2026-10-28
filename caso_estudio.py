@@ -25,11 +25,6 @@ from modules.orquestador_langgraph.langgraph_agent.nodes import (
 from modules.orquestador_langgraph.optimizacion.diseno_experimental import (
     generar_escenarios_heurísticos,
 )
-from modules.orquestador_langgraph.optimizacion.analisis_sensibilidad import (
-    analisis_sobol,
-    analisis_anova,
-    detectar_interacciones,
-)
 from modules.orquestador_langgraph.visualizacion.figuras_articulo import (
     figura_1_arquitectura,
     figura_2_mapa_regiones,
@@ -279,6 +274,15 @@ def generar_figuras(resultados_por_region: dict, expertos_por_region: dict) -> N
     figura_2_mapa_regiones()
     figura_4_flujo_langgraph()
 
+    ruta_sobol = os.path.join(
+        os.path.dirname(os.path.abspath(__file__)),
+        "results",
+        "digital_twin",
+        "sobol_sensitivity.csv",
+    )
+    resultados_sobol = pd.read_csv(ruta_sobol)
+    figura_5_sensibilidad(resultados_sobol)
+
     for region in REGIONES:
         if region not in resultados_por_region:
             continue
@@ -296,11 +300,6 @@ def generar_figuras(resultados_por_region: dict, expertos_por_region: dict) -> N
             vars_disp = [v for v in variables if v in resultados.columns]
             if vars_disp and "rendimiento_ton_ha" in resultados.columns:
                 fig10 = figura_10_arbol_regresion(resultados, vars_disp)
-
-            # Figura 5: Sensibilidad
-            indices = analisis_sobol(resultados, vars_disp, ["rendimiento_ton_ha", "uso_agua_m3_ha"])
-            if indices:
-                fig5 = figura_5_sensibilidad(indices)
 
             # Figura 8: Radar
             if not frente.empty and "rendimiento_ton_ha" in frente.columns:

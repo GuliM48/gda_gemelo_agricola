@@ -206,13 +206,31 @@ Se acopló el simulador de procesos biofísicos para balance hídrico, transpira
 
 Descomposición de la varianza total de salida del Gemelo Digital mediante muestreo de Saltelli ($N_{\text{base}} = 256$, $4,096$ evaluaciones de modelo):
 
-| Variable Evaluada | Índice Primer Orden ($S_1$) | Índice Total ($S_T$) | Interacción ($S_T - S_1$) | Rol en el Gemelo |
-| :--- | :---: | :---: | :---: | :--- |
-| **Radiación Solar (`radiation_mean`)** | **0.4215** | **0.4709** | 0.0494 | Forzamiento fotosintético dominante |
-| **Precipitación (`rainfall_mm`)** | **0.2980** | **0.3280** | 0.0300 | Oferta hídrica determinante |
-| **Temperatura (`temperature_mean_c`)** | **0.1840** | **0.2044** | 0.0204 | Desarrollo fenológico |
-| **Nitrógeno Aplicado (`nitrogen_kg_ha`)** | **0.1250** | **0.1370** | 0.0120 | Nutrición y área foliar |
-| **Arcilla en Suelo (`clay_pct`)** | **0.0890** | **0.0969** | 0.0079 | Capacidad de retención de humedad |
+| Salida | Factor de entrada | $S_1$ | $S_T$ |
+| :--- | :--- | ---: | ---: |
+| Rendimiento (`yield_ton_ha`) | Precipitación (`rainfall_mm`) | 0.0008 | 0.0212 |
+| Rendimiento (`yield_ton_ha`) | Riego (`irrigation_mm`) | -0.0042 | 0.0037 |
+| Rendimiento (`yield_ton_ha`) | Nitrógeno (`nitrogen_kg_ha`) | 0.2360 | 0.2854 |
+| Rendimiento (`yield_ton_ha`) | Temperatura media (`temperature_mean_c`) | 0.6509 | 0.6809 |
+| Rendimiento (`yield_ton_ha`) | Radiación (`radiation_mean`) | 0.0346 | 0.0467 |
+| Rendimiento (`yield_ton_ha`) | Arcilla (`clay_pct`) | 0.0000 | 0.0000 |
+| Rendimiento (`yield_ton_ha`) | Materia orgánica (`soil_organic_matter_pct`) | 0.0221 | 0.0336 |
+| Uso de agua (`water_use_m3_ha`) | Precipitación (`rainfall_mm`) | 0.0408 | 0.1871 |
+| Uso de agua (`water_use_m3_ha`) | Riego (`irrigation_mm`) | -0.0041 | 0.0883 |
+| Uso de agua (`water_use_m3_ha`) | Nitrógeno (`nitrogen_kg_ha`) | 0.0000 | 0.0000 |
+| Uso de agua (`water_use_m3_ha`) | Temperatura media (`temperature_mean_c`) | 0.7430 | 0.7761 |
+| Uso de agua (`water_use_m3_ha`) | Radiación (`radiation_mean`) | 0.0531 | 0.0699 |
+| Uso de agua (`water_use_m3_ha`) | Arcilla (`clay_pct`) | 0.0000 | 0.0000 |
+| Uso de agua (`water_use_m3_ha`) | Materia orgánica (`soil_organic_matter_pct`) | 0.0000 | 0.0000 |
+| Lixiviación (`nitrogen_leaching_kg_ha`) | Precipitación (`rainfall_mm`) | 0.1538 | 0.2165 |
+| Lixiviación (`nitrogen_leaching_kg_ha`) | Riego (`irrigation_mm`) | 0.0137 | 0.0136 |
+| Lixiviación (`nitrogen_leaching_kg_ha`) | Nitrógeno (`nitrogen_kg_ha`) | 0.6185 | 0.7012 |
+| Lixiviación (`nitrogen_leaching_kg_ha`) | Temperatura media (`temperature_mean_c`) | 0.0709 | 0.0897 |
+| Lixiviación (`nitrogen_leaching_kg_ha`) | Radiación (`radiation_mean`) | 0.0025 | 0.0056 |
+| Lixiviación (`nitrogen_leaching_kg_ha`) | Arcilla (`clay_pct`) | 0.0006 | 0.0009 |
+| Lixiviación (`nitrogen_leaching_kg_ha`) | Materia orgánica (`soil_organic_matter_pct`) | 0.0092 | 0.0158 |
+
+La Figura 5 compara los índices $S_1$ y $S_T$ para estos siete factores y las tres salidas. Los valores negativos pequeños de $S_1$ son estimaciones muestrales del análisis de Sobol y se conservan tal como fueron calculados.
 
 ---
 

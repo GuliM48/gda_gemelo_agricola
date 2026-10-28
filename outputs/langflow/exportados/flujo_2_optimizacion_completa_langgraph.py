@@ -63,8 +63,9 @@ class EstadoGDA(TypedDict, total=False):
 
 
 
-def _inicializar(estado: Dict[str, Any]) -> EstadoGDA:
+def _inicializar(state: Dict[str, Any]) -> EstadoGDA:
     """Punto de entrada del grafo: completa los parámetros de control."""
+    estado = state
     return {
         'region': estado.get('region', 'NOROESTE'),
         'num_escenarios': estado.get('num_escenarios', 10),
@@ -76,8 +77,9 @@ def _inicializar(estado: Dict[str, Any]) -> EstadoGDA:
 
 
 
-def nodo_panel_control(estado: EstadoGDA) -> EstadoGDA:
+def nodo_panel_control(state: EstadoGDA) -> EstadoGDA:
     """Nodo exportado: GDAPanelControlUsuario (GDAPanelControlUsuario)."""
+    estado = state
     region = estado.get('region', 'NOROESTE')
     objetivo = estado.get('objetivo', "max_rendimiento_min_agua")
     num_escenarios = estado.get('num_escenarios', 10)
@@ -89,8 +91,9 @@ def nodo_panel_control(estado: EstadoGDA) -> EstadoGDA:
 
 
 
-def nodo_disenar_escenarios(estado: EstadoGDA) -> EstadoGDA:
+def nodo_disenar_escenarios(state: EstadoGDA) -> EstadoGDA:
     """Nodo exportado: GDADisenarEscenariosLHS (GDADisenarEscenariosLHS)."""
+    estado = state
     panel = estado.get('panel')
     region = estado.get('region', 'NOROESTE')
     semilla = estado.get('semilla', 42)
@@ -107,8 +110,9 @@ def nodo_disenar_escenarios(estado: EstadoGDA) -> EstadoGDA:
 
 
 
-def nodo_simular_lote(estado: EstadoGDA) -> EstadoGDA:
+def nodo_simular_lote(state: EstadoGDA) -> EstadoGDA:
     """Nodo exportado: GDAEjecutarLoteSimulaciones (GDAEjecutarLoteSimulaciones)."""
+    estado = state
     escenarios = estado.get('escenarios')
     region = estado.get('region', 'NOROESTE')
     if escenarios is None:
@@ -123,8 +127,9 @@ def nodo_simular_lote(estado: EstadoGDA) -> EstadoGDA:
 
 
 
-def nodo_pareto(estado: EstadoGDA) -> EstadoGDA:
+def nodo_pareto(state: EstadoGDA) -> EstadoGDA:
     """Nodo exportado: GDAOptimizarParetoNSGAIII (GDAOptimizarParetoNSGAIII)."""
+    estado = state
     resultados = estado.get('resultados')
     if resultados is None:
         raise ValueError('Faltan resultados de simulación para el frente de Pareto')
@@ -135,8 +140,9 @@ def nodo_pareto(estado: EstadoGDA) -> EstadoGDA:
 
 
 
-def nodo_sensibilidad(estado: EstadoGDA) -> EstadoGDA:
+def nodo_sensibilidad(state: EstadoGDA) -> EstadoGDA:
     """Nodo exportado: GDAAnalisisSensibilidadSobol (GDAAnalisisSensibilidadSobol)."""
+    estado = state
     resultados = estado.get('resultados')
     if resultados is None:
         raise ValueError('Faltan resultados de simulación para el análisis de sensibilidad')
@@ -146,8 +152,9 @@ def nodo_sensibilidad(estado: EstadoGDA) -> EstadoGDA:
 
 
 
-def nodo_reporte(estado: EstadoGDA) -> EstadoGDA:
+def nodo_reporte(state: EstadoGDA) -> EstadoGDA:
     """Nodo exportado: GDAGenerarReporte (GDAGenerarReporte)."""
+    estado = state
     frente_pareto = estado.get('frente_pareto')
     if frente_pareto is not None and len(frente_pareto) > 0:
         reporte = generar_informe(frente_pareto, tipo_informe="simulaciones", titulo="Optimización multiobjetivo de manejo de maíz", arquetipos=estado.get('arquetipos'))
@@ -158,8 +165,9 @@ def nodo_reporte(estado: EstadoGDA) -> EstadoGDA:
 
 
 
-def nodo_mostrar(estado: EstadoGDA) -> EstadoGDA:
+def nodo_mostrar(state: EstadoGDA) -> EstadoGDA:
     """Nodo exportado: GDAMostrarDataFrame (GDAMostrarDataFrame)."""
+    estado = state
     frente_pareto = estado.get('frente_pareto')
     tabla = frente_pareto if frente_pareto is not None else pd.DataFrame()
     if len(tabla) > 25:

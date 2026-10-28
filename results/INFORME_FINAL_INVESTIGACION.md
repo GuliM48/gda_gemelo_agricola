@@ -117,6 +117,8 @@ La partición se efectuó con semilla 42 y estratificación por `macro_region_me
 - **VALIDATION (15.0%):** 751 parcelas (utilizado para selección de modelo, calibración de paradas y validación empírica).
 - **TEST (15.0%):** 752 parcelas (**completamente aislado en bóveda ciega** hasta la evaluación final del modelo ganador).
 
+**Relación con la partición del Gemelo Digital:** La etapa 07 aplica una partición aleatoria distinta, con semilla 42, de **60% para calibración (3,004 registros) y 40% para holdout interno (2,005)**. El 60/40 es un compromiso operativo: reserva más observaciones para ajustar los parámetros y mantiene un subconjunto sustancial para evaluar el simulador; el informe y el código no documentan un análisis de potencia ni una comparación empírica de proporciones alternativas, por lo que no debe presentarse como una proporción optimizada. Las particiones del simulador no son disjuntas de la prueba ciega del predictor: al reproducir ambas asignaciones por `record_id`, **435 de las 752 parcelas TEST** aparecen en calibración del simulador y **317** en su holdout. Por tanto, TEST siguió aislado del entrenamiento y tuning del predictor, pero no de todo el flujo del Gemelo Digital.
+
 ---
 
 ## 🌲 8. Entrenamiento y 5-Fold Cross Validation de los 5 Modelos
@@ -202,13 +204,15 @@ Evaluación sobre las **752 parcelas ciegas** que nunca participaron en tuning n
 ## 🖥️ 14. Calibración y Validación del Gemelo Digital Biofísico
 El modelo de Machine Learning es un emulador empírico; **NO es el Gemelo Digital**. Para el Gemelo Digital se calibró un simulador mecanicista dinámico de balance hídrico, asimilación por radiación y transporte de nitrato:
 
+- **Datos y alcance de la validación:** De los 5,009 registros, solo **48** tienen rendimiento, biomasa y uso de agua medidos simultáneamente; por el umbral mínimo de 200 registros, la etapa 07 usa los 5,009 y completa valores faltantes con proxies (biomasa = rendimiento / 0.42; uso de agua = lluvia × 8.5). En la asignación reproducida, 26 registros completos quedan en calibración y 22 en holdout; por ello, el holdout de 2,005 no equivale a 2,005 observaciones independientes con biomasa y agua medidas. Además, 317 registros de ese holdout pertenecen también al TEST del predictor, como se detalla en la sección 7. Las métricas siguientes deben interpretarse como evaluación interna sobre una mezcla de mediciones y proxies, no como validación externa independiente basada íntegramente en ground truth.
+
 - **Parámetros Calibrados mediante Optimización L-BFGS-B:**
   * Eficiencia en el Uso de la Radiación ($RUE$): **1.5601 g/MJ** (rango agronómico: 1.4–1.8).
   * Coeficiente Máximo de Cultivo ($K_{c,\text{max}}$): **0.8000** (para maíz bajo estrés hídrico moderado).
   * Índice de Cosecha Potencial Base ($HI_{\text{base}}$): **0.4711** (realista para híbridos y criollos).
   * Factor de Partición de Lixiviación ($f_{\text{leach}}$): **0.1800**.
 
-- **Validación Independiente del Gemelo Digital (Tabla 11):**
+- **Evaluación holdout del Gemelo Digital (Tabla 11):**
   * **Rendimiento de Grano:** Observado medio = $3.98$ t/ha, Simulado medio = $3.76$ t/ha ($RMSE = 2.56$ t/ha, PBIAS = **$-5.37\%$**).
   * **Biomasa Aérea:** Observado medio = $9.35$ t/ha, Simulado medio = $8.77$ t/ha ($RMSE = 5.62$ t/ha, PBIAS = **$-6.27\%$**).
   * **Consumo de Agua:** Observado medio = $1251.96$ m³/ha, Simulado medio = $4122.06$ m³/ha ($RMSE = 3108.5$ m³/ha).
@@ -242,23 +246,40 @@ Sujeto a: Riego $\in [0, 500]$ mm, Nitrógeno $\in [0, 300]$ kg N/ha, Densidad $
 ---
 
 ## 🌐 17. Análisis Global de Sensibilidad de Sobol (SALib)
-Evaluación con **4,096 simulaciones del diseño de Saltelli**:
-- **Para Rendimiento de Grano (`yield_ton_ha`):**
-  1. `rainfall_mm`: $S_1 = 0.412, \; S_T = 0.528$ (Mayor contribuyente a la varianza).
-  2. `nitrogen_kg_ha`: $S_1 = 0.285, \; S_T = 0.394$.
-  3. `irrigation_mm`: $S_1 = 0.142, \; S_T = 0.218$.
-  4. `temperature_mean_c`: $S_1 = 0.082, \; S_T = 0.145$.
-- **Para Consumo de Agua (`water_use_m3_ha`):**
-  * Dominado por la oferta hídrica (`rainfall_mm` $S_T = 0.612$; `irrigation_mm` $S_T = 0.354$).
-- **Para Lixiviación de Nitrógeno (`nitrogen_leaching_kg_ha`):**
-  * Fuerte interacción no lineal entre exceso de agua y nitrógeno aplicado (`nitrogen_kg_ha` $S_T = 0.582$; `rainfall_mm` $S_T = 0.395$; interacción $S_T - S_1 \approx 0.18$).
+Evaluación con **4,096 simulaciones del diseño de Saltelli** ($N_{\text{base}} = 256$), usando los siete factores de entrada definidos en la etapa 10. La Figura 5 presenta los índices de primer orden ($S_1$) y de orden total ($S_T$), con intervalos de confianza del 95%, para las mismas tres salidas:
+
+| Salida | Factor de entrada | $S_1$ | $S_T$ |
+| :--- | :--- | ---: | ---: |
+| Rendimiento (`yield_ton_ha`) | Precipitación (`rainfall_mm`) | 0.0008 | 0.0212 |
+| Rendimiento (`yield_ton_ha`) | Riego (`irrigation_mm`) | -0.0042 | 0.0037 |
+| Rendimiento (`yield_ton_ha`) | Nitrógeno (`nitrogen_kg_ha`) | 0.2360 | 0.2854 |
+| Rendimiento (`yield_ton_ha`) | Temperatura media (`temperature_mean_c`) | 0.6509 | 0.6809 |
+| Rendimiento (`yield_ton_ha`) | Radiación (`radiation_mean`) | 0.0346 | 0.0467 |
+| Rendimiento (`yield_ton_ha`) | Arcilla (`clay_pct`) | 0.0000 | 0.0000 |
+| Rendimiento (`yield_ton_ha`) | Materia orgánica (`soil_organic_matter_pct`) | 0.0221 | 0.0336 |
+| Uso de agua (`water_use_m3_ha`) | Precipitación (`rainfall_mm`) | 0.0408 | 0.1871 |
+| Uso de agua (`water_use_m3_ha`) | Riego (`irrigation_mm`) | -0.0041 | 0.0883 |
+| Uso de agua (`water_use_m3_ha`) | Nitrógeno (`nitrogen_kg_ha`) | 0.0000 | 0.0000 |
+| Uso de agua (`water_use_m3_ha`) | Temperatura media (`temperature_mean_c`) | 0.7430 | 0.7761 |
+| Uso de agua (`water_use_m3_ha`) | Radiación (`radiation_mean`) | 0.0531 | 0.0699 |
+| Uso de agua (`water_use_m3_ha`) | Arcilla (`clay_pct`) | 0.0000 | 0.0000 |
+| Uso de agua (`water_use_m3_ha`) | Materia orgánica (`soil_organic_matter_pct`) | 0.0000 | 0.0000 |
+| Lixiviación (`nitrogen_leaching_kg_ha`) | Precipitación (`rainfall_mm`) | 0.1538 | 0.2165 |
+| Lixiviación (`nitrogen_leaching_kg_ha`) | Riego (`irrigation_mm`) | 0.0137 | 0.0136 |
+| Lixiviación (`nitrogen_leaching_kg_ha`) | Nitrógeno (`nitrogen_kg_ha`) | 0.6185 | 0.7012 |
+| Lixiviación (`nitrogen_leaching_kg_ha`) | Temperatura media (`temperature_mean_c`) | 0.0709 | 0.0897 |
+| Lixiviación (`nitrogen_leaching_kg_ha`) | Radiación (`radiation_mean`) | 0.0025 | 0.0056 |
+| Lixiviación (`nitrogen_leaching_kg_ha`) | Arcilla (`clay_pct`) | 0.0006 | 0.0009 |
+| Lixiviación (`nitrogen_leaching_kg_ha`) | Materia orgánica (`soil_organic_matter_pct`) | 0.0092 | 0.0158 |
+
+**Leyenda de la Figura 5:** $S_1$ representa el efecto de primer orden; $S_T$ incluye el efecto total del factor y sus interacciones. Las barras de error muestran los intervalos de confianza del 95%. Los índices se tomaron del archivo de resultados de Sobol generado por la etapa 10; las correlaciones de escenarios no se usan como sustituto.
 
 ---
 
 ## ⚠️ 18. Limitaciones Científicas y Metodológicas
 1. **Desbalance Muestral Geográfico:** El dataset maestro posee un 91.5% de registros de Chiapas y porcentajes menores en Bajío y Colorado. Aunque se aplicó estratificación rigurosa, las conclusiones en zonas irrigadas provienen de submuestras con menor $N$.
 2. **Naturaleza Asociativa de los Modelos ML:** Los coeficientes de importancia y valores SHAP reflejan dependencias estadísticas predictivas, no mecanismos causales biológicos. No debe inferirse causalidad a partir de árboles de decisión.
-3. **Independencia del Gemelo Digital:** El Gemelo Digital no puede declararse validado simplemente por el alto $R^2$ de XGBoost ($0.84$). Su validación descansa en la confrontación independiente biofísica contra ground-truth de biomasa y agua.
+3. **Alcance de la validación del Gemelo Digital:** El Gemelo Digital no puede declararse validado simplemente por el alto $R^2$ de XGBoost ($0.84$). El holdout de la etapa 07 se solapa con el TEST del predictor y contiene valores proxy de biomasa y uso de agua; se requiere una evaluación adicional con observaciones biofísicas medidas y parcelas no usadas en la calibración para sustentar una validación externa independiente.
 
 ---
 

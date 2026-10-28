@@ -121,7 +121,9 @@ class ZonaManejo(Agent):
             lix = max(0, (self.humedad_actual - self.awc * 600) / 1000 * 0.5)
             self.lixiviacion_N_total += lix * (self.dosis_N / 150)
 
-        self.uso_agua_total_mm += etc + max(0, riego_mm - et0)
+        if riego_mm > 0:
+            self.riego_aplicado_total_mm += float(riego_mm)
+        self.uso_agua_total_mm += etc + float(riego_mm)
         return etc
 
     def _balance_nutricional(self) -> None:

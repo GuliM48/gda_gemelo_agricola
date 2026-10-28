@@ -88,7 +88,7 @@ def ejecutar_simulaciones(estado: EstadoOrquestador) -> EstadoOrquestador:
     # Cargar datos climáticos para la región
     try:
         datos_region = generar_datos_maiz()
-        clima_region = datos_region.get(region, {}).get("meteo_maize_MX")
+        region_data = datos_region.get(region, {}) if isinstance(datos_region, dict) else {}\n        clima_region = region_data.get("meteo_maize_MX") or region_data.get("meteo") or region_data.get("meteo_maize")
         if clima_region is not None and len(clima_region) > 0:
             # Agrupar por mes y usar promedio como plantilla diaria
             clima_promedio = clima_region.groupby("Month").agg({

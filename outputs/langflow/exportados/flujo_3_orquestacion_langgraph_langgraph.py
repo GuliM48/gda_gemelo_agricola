@@ -58,8 +58,9 @@ class EstadoGDA(TypedDict, total=False):
 
 
 
-def _inicializar(estado: Dict[str, Any]) -> EstadoGDA:
+def _inicializar(state: Dict[str, Any]) -> EstadoGDA:
     """Punto de entrada del grafo: completa los parámetros de control."""
+    estado = state
     return {
         'region': estado.get('region', 'NOROESTE'),
         'num_escenarios': estado.get('num_escenarios', 10),
@@ -71,8 +72,9 @@ def _inicializar(estado: Dict[str, Any]) -> EstadoGDA:
 
 
 
-def nodo_panel_control(estado: EstadoGDA) -> EstadoGDA:
+def nodo_panel_control(state: EstadoGDA) -> EstadoGDA:
     """Nodo exportado: GDAPanelControlUsuario (GDAPanelControlUsuario)."""
+    estado = state
     region = estado.get('region', 'CENTRO-OCCIDENTE')
     objetivo = estado.get('objetivo', "max_rendimiento_min_agua")
     num_escenarios = estado.get('num_escenarios', 8)
@@ -84,8 +86,9 @@ def nodo_panel_control(estado: EstadoGDA) -> EstadoGDA:
 
 
 
-def nodo_disenar_escenarios(estado: EstadoGDA) -> EstadoGDA:
+def nodo_disenar_escenarios(state: EstadoGDA) -> EstadoGDA:
     """Nodo exportado: GDADisenarEscenariosLHS (GDADisenarEscenariosLHS)."""
+    estado = state
     panel = estado.get('panel')
     region = estado.get('region', 'CENTRO-OCCIDENTE')
     semilla = estado.get('semilla', 42)
@@ -102,8 +105,9 @@ def nodo_disenar_escenarios(estado: EstadoGDA) -> EstadoGDA:
 
 
 
-def nodo_simular_lote(estado: EstadoGDA) -> EstadoGDA:
+def nodo_simular_lote(state: EstadoGDA) -> EstadoGDA:
     """Nodo exportado: GDAEjecutarLoteSimulaciones (GDAEjecutarLoteSimulaciones)."""
+    estado = state
     escenarios = estado.get('escenarios')
     region = estado.get('region', 'CENTRO-OCCIDENTE')
     if escenarios is None:
@@ -118,8 +122,9 @@ def nodo_simular_lote(estado: EstadoGDA) -> EstadoGDA:
 
 
 
-def nodo_sensibilidad(estado: EstadoGDA) -> EstadoGDA:
+def nodo_sensibilidad(state: EstadoGDA) -> EstadoGDA:
     """Nodo exportado: GDAAnalisisSensibilidadSobol (GDAAnalisisSensibilidadSobol)."""
+    estado = state
     resultados = estado.get('resultados')
     if resultados is None:
         raise ValueError('Faltan resultados de simulación para el análisis de sensibilidad')
@@ -129,8 +134,9 @@ def nodo_sensibilidad(estado: EstadoGDA) -> EstadoGDA:
 
 
 
-def nodo_reporte(estado: EstadoGDA) -> EstadoGDA:
+def nodo_reporte(state: EstadoGDA) -> EstadoGDA:
     """Nodo exportado: GDAGenerarReporte (GDAGenerarReporte)."""
+    estado = state
     indices_sobol = estado.get('indices_sobol')
     if indices_sobol is not None and len(indices_sobol) > 0:
         reporte = generar_informe(indices_sobol, tipo_informe="simulaciones", titulo="Informe de hallazgos — Orquestación LangGraph", arquetipos=estado.get('arquetipos'))
