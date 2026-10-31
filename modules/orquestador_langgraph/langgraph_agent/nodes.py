@@ -85,36 +85,87 @@ def ejecutar_simulaciones(estado: EstadoOrquestador) -> EstadoOrquestador:
     diseño = estado["diseño_experimental"]
     errores = estado.get("errores", [])
 
-    # Cargar datos climáticos para la región
+    # Cargar datos climáticos para la región — validación estricta de fuente (FON-06)
+    import os as _os
+
+    # Orden de resolución: nombre canónico → alias en memoria → alias CSV heredado
+    _CLAVES_CLIMA = ("meteo_maize_MX", "meteo_maize", "meteo")
+    _ALLOW_SYNTHETIC = _os.environ.get("ALLOW_SYNTHETIC_WEATHER", "false").lower() == "true"
+
+    def _resolver_clima_df(region_data: dict, region: str) -> pd.DataFrame:
+        """
+        Resuelve la fuente climática con validación estricta.
+
+        Busca las claves en orden de prioridad descendente. Si ninguna
+        clave produce un DataFrame válido y ALLOW_SYNTHETIC_WEATHER != 'true',
+        lanza ValueError para evitar simulaciones silenciosas con datos
+        sintéticos que podrían enmascarar errores de pipeline.
+
+        Raises
+        ------
+        ValueError
+            Si no hay fuente real y ALLOW_SYNTHETIC_WEATHER no está habilitada.
+        """
+        for clave in _CLAVES_CLIMA:
+            df = region_data.get(clave)
+            if df is not None and not df.empty:
+                logger.info(
+                    "FUENTE_CLIMA | región=%s | clave='%s' | filas=%d | sintético=False",
+                    region, clave, len(df),
+                )
+                return df
+        if not _ALLOW_SYNTHETIC:
+            raise ValueError(
+                f"No se encontró clima real para la región '{region}'. "
+                f"Claves buscadas: {_CLAVES_CLIMA}. "
+                f"Para permitir datos sintéticos establezca "
+                f"ALLOW_SYNTHETIC_WEATHER=true (solo en desarrollo)."
+            )
+        logger.warning(
+            "FUENTE_CLIMA | región=%s | clave=SYNTHETIC | "
+            "ALLOW_SYNTHETIC_WEATHER=true — resultados NO reproducibles",
+            region,
+        )
+        np.random.seed(42)
+        return pd.DataFrame({
+            "precip_mm":       np.maximum(0, np.random.normal(5, 4, 12)),
+            "t_max_c":         np.random.normal(28, 3, 12),
+            "t_min_c":         np.random.normal(16, 2, 12),
+            "radiacion_mj_m2": np.random.normal(18, 3, 12),
+            "Month":           list(range(1, 13)),
+        })
+
     try:
         datos_region = generar_datos_maiz()
-        region_data = datos_region.get(region, {}) if isinstance(datos_region, dict) else {}\n        clima_region = region_data.get("meteo_maize_MX") or region_data.get("meteo") or region_data.get("meteo_maize")
-        if clima_region is not None and len(clima_region) > 0:
-            # Agrupar por mes y usar promedio como plantilla diaria
+        region_data = datos_region.get(region, {}) if isinstance(datos_region, dict) else {}
+        clima_region = _resolver_clima_df(region_data, region)
+
+        # Agrupar por mes y usar promedio como plantilla diaria
+        if "Month" in clima_region.columns:
             clima_promedio = clima_region.groupby("Month").agg({
                 "precip_mm": "mean",
                 "t_max_c": "mean",
                 "t_min_c": "mean",
                 "radiacion_mj_m2": "mean",
             }).reset_index()
-            # Crear serie de 150 días repitiendo el patrón mensual
-            dias_por_mes = 150 // 12 + 1
-            clima_series = []
-            for dia in range(150):
-                mes = (dia % 12) + 1
-                fila_mes = clima_promedio[clima_promedio["Month"] == mes]
-                if len(fila_mes) > 0:
-                    clima_series.append(fila_mes.iloc[0].to_dict())
-            datos_clima = pd.DataFrame(clima_series)
         else:
-            # Datos climáticos sintéticos de respaldo
-            np.random.seed(42)
-            datos_clima = pd.DataFrame({
-                "precipitacion_mm": np.maximum(0, np.random.normal(5, 4, 150)),
-                "t_max_c": np.random.normal(28, 3, 150),
-                "t_min_c": np.random.normal(16, 2, 150),
-                "radiacion_mj_m2": np.random.normal(18, 3, 150),
-            })
+            clima_promedio = clima_region.copy()
+            clima_promedio["Month"] = range(1, len(clima_promedio) + 1)
+
+        # Crear serie de 150 días repitiendo el patrón mensual
+        clima_series = []
+        for dia in range(150):
+            mes = (dia % 12) + 1
+            fila_mes = clima_promedio[clima_promedio["Month"] == mes]
+            if len(fila_mes) > 0:
+                clima_series.append(fila_mes.iloc[0].to_dict())
+        datos_clima = pd.DataFrame(clima_series)
+        # Normalizar nombre de columna de precipitación al estándar interno del agente
+        if "precip_mm" in datos_clima.columns and "precipitacion_mm" not in datos_clima.columns:
+            datos_clima = datos_clima.rename(columns={"precip_mm": "precipitacion_mm"})
+
+    except ValueError:
+        raise  # Error de fuente no autorizado: no silenciar
     except Exception as e:
         logger.warning(f"Error cargando clima: {e}")
         datos_clima = pd.DataFrame({
