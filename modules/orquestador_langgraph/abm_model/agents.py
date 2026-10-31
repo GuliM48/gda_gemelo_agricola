@@ -79,6 +79,7 @@ class ZonaManejo(Agent):
         # Métricas acumuladas
         self.historial: list = []
         self.uso_agua_total_mm: float = 0.0
+        self.riego_aplicado_total_mm: float = 0.0
         self.lixiviacion_N_total: float = 0.0
         self.estres_hidrico_acumulado: float = 0.0
         self.estres_nutricional_acumulado: float = 0.0
