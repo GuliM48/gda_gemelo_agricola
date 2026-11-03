@@ -11,11 +11,11 @@ En la región SURESTE, el rendimiento simulado promedio fue 7.27 ton/ha. El mode
 
 ## 4.2 Desempeño comparativo: agente autónomo vs exploración manual
 
-Región NOROESTE: El agente exploró 50 escenarios en 21.7s, alcanzando un rendimiento máximo de 8.00 ton/ha.
+Región NOROESTE: El agente exploró 50 escenarios en 30.3s, alcanzando un rendimiento máximo de 8.00 ton/ha.
 
-Región CENTRO-OCCIDENTE: El agente exploró 50 escenarios en 20.2s, alcanzando un rendimiento máximo de 8.00 ton/ha.
+Región CENTRO-OCCIDENTE: El agente exploró 50 escenarios en 23.5s, alcanzando un rendimiento máximo de 8.00 ton/ha.
 
-Región SURESTE: El agente exploró 50 escenarios en 19.5s, alcanzando un rendimiento máximo de 8.00 ton/ha.
+Región SURESTE: El agente exploró 50 escenarios en 20.8s, alcanzando un rendimiento máximo de 8.00 ton/ha.
 
 
 ## 4.3 Análisis de sensibilidad global
@@ -25,11 +25,11 @@ El análisis de sensibilidad Sobol permitió identificar las variables de manejo
 
 ## 4.4 Frentes de Pareto y trade-offs entre objetivos
 
-En NOROESTE se identificaron 2 soluciones no dominadas en el frente de Pareto, evidenciando trade-offs claros entre rendimiento y uso de recursos.
+En NOROESTE se identificaron 3 soluciones no dominadas en el frente de Pareto, evidenciando trade-offs claros entre rendimiento y uso de recursos.
 
-En CENTRO-OCCIDENTE se identificaron 2 soluciones no dominadas en el frente de Pareto, evidenciando trade-offs claros entre rendimiento y uso de recursos.
+En CENTRO-OCCIDENTE se identificaron 3 soluciones no dominadas en el frente de Pareto, evidenciando trade-offs claros entre rendimiento y uso de recursos.
 
-En SURESTE se identificaron 3 soluciones no dominadas en el frente de Pareto, evidenciando trade-offs claros entre rendimiento y uso de recursos.
+En SURESTE se identificaron 4 soluciones no dominadas en el frente de Pareto, evidenciando trade-offs claros entre rendimiento y uso de recursos.
 
 
 ## 4.5 Estrategias óptimas de manejo por región
