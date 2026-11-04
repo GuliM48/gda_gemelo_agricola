@@ -189,7 +189,7 @@ def run_stage07():
         ax.set_ylabel(f"Simulated by Digital Twin: {lbl}", fontsize=10)
         ax.legend()
 
-    plt.suptitle("Independent Validation of the Digital Twin: Observed vs Simulated", fontsize=14, y=1.01)
+    plt.suptitle("Validation of the Digital Twin: Observed vs Simulated", fontsize=14, y=1.01)
     plt.tight_layout()
     plt.savefig(f"{dt_dir}/observed_vs_simulated_twin.png", dpi=300)
     plt.close()
