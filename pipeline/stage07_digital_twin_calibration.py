@@ -170,10 +170,10 @@ def run_stage07():
     fig, axes = plt.subplots(2, 2, figsize=(14, 12))
     
     configs = [
-        (axes[0, 0], y_obs_val, y_sim_val, 'Rendimiento (ton/ha)', 'darkgreen', 'Yield (ton/ha)'),
-        (axes[0, 1], b_obs_val, b_sim_val, 'Biomasa Aérea (ton/ha)', 'goldenrod', 'Biomass (ton/ha)'),
-        (axes[1, 0], w_obs_val, w_sim_val, 'Consumo de Agua (m³/ha)', 'deepskyblue', 'Water Use (m³/ha)'),
-        (axes[1, 1], nl_obs_proxy, nl_sim_val, 'Lixiviación de Nitrógeno (kg N/ha)', 'crimson', 'N Leaching (kg/ha)')
+        (axes[0, 0], y_obs_val, y_sim_val, 'Grain Yield (t ha⁻¹)', 'darkgreen', 'Yield (t ha⁻¹)'),
+        (axes[0, 1], b_obs_val, b_sim_val, 'Aboveground Biomass (t ha⁻¹)', 'goldenrod', 'Biomass (t ha⁻¹)'),
+        (axes[1, 0], w_obs_val, w_sim_val, 'Water Use (m³ ha⁻¹)', 'deepskyblue', 'Water Use (m³ ha⁻¹)'),
+        (axes[1, 1], nl_obs_proxy, nl_sim_val, 'Nitrogen Leaching (kg N ha⁻¹)', 'crimson', 'N Leaching (kg N ha⁻¹)')
     ]
 
     for ax, obs, sim, title, color, lbl in configs:
@@ -185,11 +185,11 @@ def run_stage07():
         r2_v = r2_score(obs, sim)
         rmse_v = np.sqrt(mean_squared_error(obs, sim))
         ax.set_title(f"{title}\n$R^2 = {r2_v:.3f}$ | RMSE = {rmse_v:.2f}", fontsize=11)
-        ax.set_xlabel(f"Observado: {lbl}", fontsize=10)
-        ax.set_ylabel(f"Simulado por Gemelo Digital: {lbl}", fontsize=10)
+        ax.set_xlabel(f"Observed: {lbl}", fontsize=10)
+        ax.set_ylabel(f"Simulated by Digital Twin: {lbl}", fontsize=10)
         ax.legend()
 
-    plt.suptitle("Validación Independiente del Gemelo Digital: Observado vs Simulado", fontsize=14, y=1.01)
+    plt.suptitle("Independent Validation of the Digital Twin: Observed vs Simulated", fontsize=14, y=1.01)
     plt.tight_layout()
     plt.savefig(f"{dt_dir}/observed_vs_simulated_twin.png", dpi=300)
     plt.close()

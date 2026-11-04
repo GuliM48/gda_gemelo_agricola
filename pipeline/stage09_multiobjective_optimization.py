@@ -233,7 +233,7 @@ def run_stage09():
             'Rendimiento_ton_ha': knee_sol['yield_ton_ha'],
             'Uso_Agua_m3_ha': knee_sol['water_use_m3_ha'],
             'Lixiviacion_N_kg_ha': knee_sol['nitrogen_leaching_kg_ha'],
-            'Tradeoff_Clave': 'Balance armónico óptimo: rinde alto (>85% del máx) con 35% menos agua y 60% menos lixiviación.'
+            'Tradeoff_Clave': 'Balance armónico óptimo: alcanza ~80% del rendimiento máximo con ~8% menos consumo de agua y ~64% menos lixiviación de N respecto al escenario de máximo rendimiento.'
         }
     ]
 
